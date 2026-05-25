@@ -1,6 +1,0 @@
-index,given_label,given_label_name,prob_human,prob_machine,quality_score,flagged,text_snippet
-35,0,human,0.0019,0.9981,0.0019,True,Isizathu salokho kuholakala lapha: ukulima kuyindlela yomlimi yokusebenza futhi kuyindlela umlimi ephila ngayo (kuyimpil
-1201,0,human,1e-04,0.9999,1e-04,True,"Inkokhelo yezimoto zangasese R 9 269. Yomphakathi R 92 598. Mina, Baldwin Sipho Ngubane, uNgqongqoshe wezamaKhono, amaSi"
-1238,1,machine,0.9991,0.0009,0.0009,True,Ukukhokha izilinganiso emhlabeni/ezakhiweni lapho ubunikazi babelana khona kuyisithwathwa kulabo banikazi ngokuhlanganye
-1705,0,human,1e-04,0.9999,1e-04,True,E-Eastern Cape kunzima ukuthola abaluleki ngoba abekho abakhiqizi bezomnotho emaphandleni. Kufanele siqhubeke ukwazisa a
-1954,0,human,1e-04,0.9999,1e-04,True,"Ubhekilanga usitshalo sezimbewu zikawoyela esibalulekile kakhulu lapha eNingizimu Afrika, esikhathini eside sivama ukukh"

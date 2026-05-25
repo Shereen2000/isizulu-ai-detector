@@ -1,0 +1,16 @@
+eval_idx,test_idx,jaccard_similarity,eval_snippet,test_snippet
+910,975,0.8281,"Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi","Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi"
+71,782,0.7812,Imicimbi yokuphepha nemisebenzi ye-ofisi... Ukucubungula kwezezimali ngaphakathi. Ukuphathwa kwezins,Izenzakalo zokuphepha nemisebenzi ye-ofisi... Ukuhlela kwezimali ngaphakathi. Ukuphathwa kwezinsiza 
+65,658,0.7734,"Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi ahlinzeka ngosizo olubalulekile ","Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi anikeza usizo olubalulekile kuba"
+770,778,0.7656,"Emkhakheni wezobuchwepheshe, kunezinkomba ezibalulekile okufanele sihlole kuzo ezingeni eliphakathi ","Emkhakheni wezobuchwepheshe, kunezinkomba ezibalulekile okufanele sizibandakanye nazo ezingeni eliph"
+976,307,0.7266,"Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizimele ezikhungweni zobuciko bendawo. Lokhu ","Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizinkulu ezihlanganyela nezobuciko bendawo. L"
+261,656,0.6875,Khulula amandla ngaphambi kokuhambisa umshini. Ukugoba kwe-header. Iziphuzo eziqinisekisiwe ezingago,Khipha amandla ngaphambi kokuhambisa umshini. Ukugoba kwe-header. Iziqongo ezimisiwe ezingagoba kanc
+807,728,0.6875,Sivumelana nesu lokuthuthukisa elinophahla olukhulu futhi investa izinsiza kubantu bethu bonke. Ukul,Sivumelana nesu lokuthuthukiswa elinophiko olubanzi futhi investa izinsiza kubantu bethu bonke. Ukul
+696,650,0.6641,"Lesi sikhungo sithuthukise indlela eqinile yokuphatha eholelwa ngumenzi, esekelwa ngumsizi nomqondis",Ubudlelwano bamazwe omhlaba bokuthula nokuvikela iziqoqo. Lezi zicabango zashintsha zaba izenzo ngon
+544,690,0.625,Itayari yakho ingagugula ngokushesha esontweni lokuqala uma ingafakiwe kahle noma uma i-valve ivulek,Hlola umoya kuma-tires akho nsuku zonke esontweni lokuqala ngemuva kokufaka ama-tires amasha. Ngemuv
+648,39,0.5859,"Amawheels awakwazi ukukhuluma. Ngakho-ke, kusezandleni zethu, abanikazi bamaTaxi, kanye nabashayeli ","Ngakho, kuncike kithi, abanikazi beTaxi, nabashayeli ukuba sihlolisise ukulimala futhi silungise nga"
+370,576,0.5625,Lo mshayela ubukeka engazi lutho ngama-wheels aphephile! Uyalungile! Noma ubani ophuthelwa amawheels,Lo mshayeli ubukeka engazi lutho ngama-wheels aphephile! Uyalungile! Noma ubani ophuthelwa amawheels
+664,847,0.5625,Isithombe 1: I-header ejikayo emaphakathi ikhombisa inani elikhulu lokufakwa kwamanzi okwenzeka ekug,Isithombe 1: I-header ejikayo emaphakathi ibonisa ukuthi kukhona ukujikeleza okuningi okwenzeka ekug
+737,413,0.5625,Izindlela zokuhlola ukusebenza kokubambisana ziqhubeka nokuhlinzeka ngenhloso ewusizo engxoxweni yez,Izindlela zokuhlola Umsebenzi Wokubambisana ziqhubeka nokuhlinzeka ngenhloso yokwakha engxoxweni yez
+505,19,0.5547,"Lo hlelo luhlanganisa ukuhlela izikhungo eziqinisekisa ikhono lokwenza imisebenzi, ukuveza konke, ne","Lolu hlelo luhlanganisa ukuhlela izikhungo ezinqoba ikhono lokwenza imisebenzi, ukuveza konke, kanye"
+884,947,0.1797,Intsha YaseNingizimu Afrika: Umqondo Wokwakha Ikusasa Intsha yaseNingizimu Afrika ibalulekile ekwakh,"Uma abasebenzi bebonisa ukuziphatha okuhle, baveza ukuzimisela ukufinyelela izinhloso, okudingeka uk"

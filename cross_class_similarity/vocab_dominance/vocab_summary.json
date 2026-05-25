@@ -1,0 +1,26 @@
+{
+  "top_n_words_tracked": 50,
+  "min_frequency": 10,
+  "chi2_significance_alpha": 0.05,
+  "train_dominance": {
+    "human_dominant_words": 50,
+    "human_dominant_significant": 50,
+    "machine_dominant_words": 50,
+    "machine_dominant_significant": 50
+  },
+  "cross_split_consistency": {
+    "eval": {
+      "total_tracked": 100,
+      "consistent": 42,
+      "inconsistent": 58,
+      "pct_consistent": "42.0%"
+    },
+    "test": {
+      "total_tracked": 100,
+      "consistent": 46,
+      "inconsistent": 54,
+      "pct_consistent": "46.0%"
+    }
+  },
+  "interpretation": "If dominant words are consistent across splits, the model had a vocabulary shortcut available. If inconsistent, the model could not have relied on specific words to classify \u2014 it had to learn genuine writing style differences."
+}

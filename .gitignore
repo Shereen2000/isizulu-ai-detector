@@ -1,14 +1,16 @@
-base model/model/model.safetensors
-finetuned_classifier/checkpoint-*/model.safetensors
-finetuned_classifier/checkpoint-*/optimizer.pt
-finetuned_classifier/checkpoint-*/rng_state.pth
-finetuned_classifier/checkpoint-*/scheduler.pt
-finetuned_classifier/checkpoint-*/training_args.bin
-finetuned_classifier/checkpoint-*/tokenizer.json
-finetuned_classifier/checkpoint-*/tokenizer_config.json
-finetuned_classifier/checkpoint-*/special_tokens_map.json
-finetuned_classifier/final_model/model.safetensors
+base_model/model.safetensors
+finetuned_model/checkpoint-*/model.safetensors
+finetuned_model/checkpoint-*/optimizer.pt
+finetuned_model/checkpoint-*/rng_state.pth
+finetuned_model/checkpoint-*/scheduler.pt
+finetuned_model/checkpoint-*/training_args.bin
+finetuned_model/checkpoint-*/tokenizer.json
+finetuned_model/checkpoint-*/tokenizer_config.json
+finetuned_model/checkpoint-*/special_tokens_map.json
+finetuned_model/final_model/model.safetensors
 .claude/
-shap_outputs/
 __pycache__/
 *.pyc
+dataset_leakage_test/human/*.jsonl
+dataset_leakage_test/machine/*.jsonl
+cross_class_similarity/splits/

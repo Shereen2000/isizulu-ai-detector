@@ -1,0 +1,230 @@
+{
+  "description": "Within-split cross-class similarity + vocabulary dominance",
+  "ngram_size": 5,
+  "minhash_permutations": 128,
+  "thresholds_tested": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+  ],
+  "similarity_results": [
+    {
+      "threshold": 0.5,
+      "splits": [
+        {
+          "split": "train",
+          "human_samples": 8207,
+          "machine_samples": 8170,
+          "cross_class_pairs": 2555,
+          "pct_of_human": "31.13%",
+          "pct_of_machine": "31.27%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        },
+        {
+          "split": "eval",
+          "human_samples": 994,
+          "machine_samples": 997,
+          "cross_class_pairs": 36,
+          "pct_of_human": "3.62%",
+          "pct_of_machine": "3.61%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        },
+        {
+          "split": "test",
+          "human_samples": 1013,
+          "machine_samples": 1009,
+          "cross_class_pairs": 37,
+          "pct_of_human": "3.65%",
+          "pct_of_machine": "3.67%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        }
+      ]
+    },
+    {
+      "threshold": 0.6,
+      "splits": [
+        {
+          "split": "train",
+          "human_samples": 8207,
+          "machine_samples": 8170,
+          "cross_class_pairs": 26,
+          "pct_of_human": "0.32%",
+          "pct_of_machine": "0.32%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        },
+        {
+          "split": "eval",
+          "human_samples": 994,
+          "machine_samples": 997,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "test",
+          "human_samples": 1013,
+          "machine_samples": 1009,
+          "cross_class_pairs": 1,
+          "pct_of_human": "0.1%",
+          "pct_of_machine": "0.1%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        }
+      ]
+    },
+    {
+      "threshold": 0.7,
+      "splits": [
+        {
+          "split": "train",
+          "human_samples": 8207,
+          "machine_samples": 8170,
+          "cross_class_pairs": 1,
+          "pct_of_human": "0.01%",
+          "pct_of_machine": "0.01%",
+          "jaccard_distribution": {
+            "0.70\u20130.79": 0,
+            "0.80\u20130.89": 0,
+            "0.90\u20130.99": 0,
+            "1.00": 0
+          }
+        },
+        {
+          "split": "eval",
+          "human_samples": 994,
+          "machine_samples": 997,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "test",
+          "human_samples": 1013,
+          "machine_samples": 1009,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        }
+      ]
+    },
+    {
+      "threshold": 0.8,
+      "splits": [
+        {
+          "split": "train",
+          "human_samples": 8207,
+          "machine_samples": 8170,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "eval",
+          "human_samples": 994,
+          "machine_samples": 997,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "test",
+          "human_samples": 1013,
+          "machine_samples": 1009,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        }
+      ]
+    },
+    {
+      "threshold": 0.9,
+      "splits": [
+        {
+          "split": "train",
+          "human_samples": 8207,
+          "machine_samples": 8170,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "eval",
+          "human_samples": 994,
+          "machine_samples": 997,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        },
+        {
+          "split": "test",
+          "human_samples": 1013,
+          "machine_samples": 1009,
+          "cross_class_pairs": 0,
+          "pct_of_human": "0.0%",
+          "pct_of_machine": "0.0%",
+          "jaccard_distribution": {}
+        }
+      ]
+    }
+  ],
+  "vocab_dominance": {
+    "top_n_words_tracked": 50,
+    "min_frequency": 10,
+    "chi2_significance_alpha": 0.05,
+    "train_dominance": {
+      "human_dominant_words": 50,
+      "human_dominant_significant": 50,
+      "machine_dominant_words": 50,
+      "machine_dominant_significant": 50
+    },
+    "cross_split_consistency": {
+      "eval": {
+        "total_tracked": 100,
+        "consistent": 42,
+        "inconsistent": 58,
+        "pct_consistent": "42.0%"
+      },
+      "test": {
+        "total_tracked": 100,
+        "consistent": 46,
+        "inconsistent": 54,
+        "pct_consistent": "46.0%"
+      }
+    },
+    "interpretation": "If dominant words are consistent across splits, the model had a vocabulary shortcut available. If inconsistent, the model could not have relied on specific words to classify \u2014 it had to learn genuine writing style differences."
+  }
+}

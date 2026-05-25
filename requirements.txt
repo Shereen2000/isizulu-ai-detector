@@ -7,3 +7,4 @@ shap==0.51.0
 matplotlib>=3.7
 cleanlab==2.9.0
 datasketch>=1.6
+scipy>=1.10

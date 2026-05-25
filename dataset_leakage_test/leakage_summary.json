@@ -1,0 +1,334 @@
+{
+  "ngram_size": 5,
+  "minhash_permutations": 128,
+  "thresholds_tested": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+  ],
+  "vocab_top_words": 30,
+  "vocab_min_freq": 5,
+  "exact_results": {
+    "human": {
+      "train\u2194eval": {
+        "eval_size": 994,
+        "exact_leaks": 17,
+        "exact_leaks_pct": "1.71%"
+      },
+      "train\u2194test": {
+        "test_size": 1013,
+        "exact_leaks": 18,
+        "exact_leaks_pct": "1.78%"
+      },
+      "eval\u2194test": {
+        "test_size": 1013,
+        "exact_leaks": 0,
+        "exact_leaks_pct": "0.0%"
+      }
+    },
+    "machine": {
+      "train\u2194eval": {
+        "eval_size": 997,
+        "exact_leaks": 0,
+        "exact_leaks_pct": "0.0%"
+      },
+      "train\u2194test": {
+        "test_size": 1009,
+        "exact_leaks": 0,
+        "exact_leaks_pct": "0.0%"
+      },
+      "eval\u2194test": {
+        "test_size": 1009,
+        "exact_leaks": 0,
+        "exact_leaks_pct": "0.0%"
+      }
+    }
+  },
+  "vocab_stability_results": {
+    "human": {
+      "top_words_tracked": 30,
+      "eval": {
+        "stable": 16,
+        "shifted": 14,
+        "pct_stable": "53.3%"
+      },
+      "test": {
+        "stable": 13,
+        "shifted": 17,
+        "pct_stable": "43.3%"
+      }
+    },
+    "machine": {
+      "top_words_tracked": 30,
+      "eval": {
+        "stable": 20,
+        "shifted": 10,
+        "pct_stable": "66.7%"
+      },
+      "test": {
+        "stable": 20,
+        "shifted": 10,
+        "pct_stable": "66.7%"
+      }
+    }
+  },
+  "near_duplicate_results": [
+    {
+      "threshold": 0.5,
+      "classes": [
+        {
+          "class": "human",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 994,
+              "near_duplicates": 374,
+              "near_duplicates_pct": "37.63%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 490,
+              "near_duplicates_pct": "48.37%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 38,
+              "near_duplicates_pct": "3.75%"
+            }
+          ]
+        },
+        {
+          "class": "machine",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 997,
+              "near_duplicates": 2331,
+              "near_duplicates_pct": "233.8%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 2065,
+              "near_duplicates_pct": "204.66%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 281,
+              "near_duplicates_pct": "27.85%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "threshold": 0.6,
+      "classes": [
+        {
+          "class": "human",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 994,
+              "near_duplicates": 74,
+              "near_duplicates_pct": "7.44%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 129,
+              "near_duplicates_pct": "12.73%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 3,
+              "near_duplicates_pct": "0.3%"
+            }
+          ]
+        },
+        {
+          "class": "machine",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 997,
+              "near_duplicates": 144,
+              "near_duplicates_pct": "14.44%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 137,
+              "near_duplicates_pct": "13.58%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 15,
+              "near_duplicates_pct": "1.49%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "threshold": 0.7,
+      "classes": [
+        {
+          "class": "human",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 994,
+              "near_duplicates": 57,
+              "near_duplicates_pct": "5.73%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 114,
+              "near_duplicates_pct": "11.25%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 3,
+              "near_duplicates_pct": "0.3%"
+            }
+          ]
+        },
+        {
+          "class": "machine",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 997,
+              "near_duplicates": 47,
+              "near_duplicates_pct": "4.71%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 49,
+              "near_duplicates_pct": "4.86%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 11,
+              "near_duplicates_pct": "1.09%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "threshold": 0.8,
+      "classes": [
+        {
+          "class": "human",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 994,
+              "near_duplicates": 49,
+              "near_duplicates_pct": "4.93%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 90,
+              "near_duplicates_pct": "8.88%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 1,
+              "near_duplicates_pct": "0.1%"
+            }
+          ]
+        },
+        {
+          "class": "machine",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 997,
+              "near_duplicates": 15,
+              "near_duplicates_pct": "1.5%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 9,
+              "near_duplicates_pct": "0.89%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 1,
+              "near_duplicates_pct": "0.1%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "threshold": 0.9,
+      "classes": [
+        {
+          "class": "human",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 994,
+              "near_duplicates": 30,
+              "near_duplicates_pct": "3.02%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 75,
+              "near_duplicates_pct": "7.4%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1013,
+              "near_duplicates": 0,
+              "near_duplicates_pct": "0.0%"
+            }
+          ]
+        },
+        {
+          "class": "machine",
+          "pairs": [
+            {
+              "pair": "train\u2194eval",
+              "eval_size": 997,
+              "near_duplicates": 0,
+              "near_duplicates_pct": "0.0%"
+            },
+            {
+              "pair": "train\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 1,
+              "near_duplicates_pct": "0.1%"
+            },
+            {
+              "pair": "eval\u2194test",
+              "test_size": 1009,
+              "near_duplicates": 0,
+              "near_duplicates_pct": "0.0%"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

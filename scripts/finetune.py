@@ -27,10 +27,10 @@ from sklearn.metrics import (
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 
-MODEL_PATH   = os.path.join(PROJECT_DIR, "base model", "model")
+MODEL_PATH   = os.path.join(PROJECT_DIR, "base_model")
 TRAIN_PATH   = os.path.join(PROJECT_DIR, "datasets", "train.jsonl")
 EVAL_PATH    = os.path.join(PROJECT_DIR, "datasets", "eval.jsonl")
-OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_classifier")
+OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_model")
 
 MAX_LENGTH    = 512
 BATCH_SIZE    = 8
