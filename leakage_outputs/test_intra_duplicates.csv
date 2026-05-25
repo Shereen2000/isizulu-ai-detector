@@ -1,0 +1,8 @@
+split,idx_a,idx_b,label_a,label_b,same_label
+test,512,714,0,0,True
+test,1131,1263,0,0,True
+test,1131,1474,0,0,True
+test,1316,1568,0,0,True
+test,1316,1772,0,0,True
+test,816,1829,1,1,True
+test,467,1895,0,0,True

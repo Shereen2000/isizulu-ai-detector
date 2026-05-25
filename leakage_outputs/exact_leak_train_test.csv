@@ -1,0 +1,19 @@
+train_idx,test_idx,train_label,test_label,label_match,text_snippet
+15074,151,0,0,True,"UMthetho wokuphathwa kwabaMnyama, njengensalela yokwakuyisisekelo sokuhlukanisa ngokobuhlanga, wachithwa ngoLwezi kowe-1"
+8724,405,0,0,True,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni lezempilo akufanele z
+11205,467,0,0,True,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni lezempilo akufanele z
+11507,512,0,0,True,"Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yizindlu zokuqhuba ucwa"
+4647,629,0,0,True,"E-Afrika, kuze kube manje le vayirasi isisabalalele emazweni ayi-16 kuphela. Ngalesi sikhathi sokubhala le ncwadi, le va"
+11507,714,0,0,True,"Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yizindlu zokuqhuba ucwa"
+3567,1050,0,0,True,Leli thebhula elilandelayo likhombisa ukusabalala esifundazweni kwamazinga amathathu obuholi bendabuko kuleli zwe. Indlu
+5490,1109,0,0,True,Ukhetho lwentando yeningi lowe-1994 lwaholela enqubweni entsha. Le nqubo entsha yaba yisisekelo sokubuyekeza umthetho ne
+9537,1131,0,0,True,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-WHO ukuzama ukuthola
+9537,1263,0,0,True,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-WHO ukuzama ukuthola
+15520,1316,0,0,True,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba nezimpawu ezingconyw"
+9537,1474,0,0,True,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-WHO ukuzama ukuthola
+15520,1568,0,0,True,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba nezimpawu ezingconyw"
+15520,1772,0,0,True,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba nezimpawu ezingconyw"
+15083,1775,0,0,True,"Abancane ngokomthetho, ngabantu abangaphansi kweminyaka engu-21, abangakaze bashade ngaphambilini. Ngokulandela umthetho"
+3792,1776,0,0,True,Abantu abangalinganiselwa ezigidini eziyishumi nane bazoba yingxenye yomphakathi wendabuko kuzo zonke izifundazwe zaseNi
+11205,1895,0,0,True,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni lezempilo akufanele z
+2227,1937,0,0,True,ukucela usizo lwenu nokuzimbandakanya kanye nokwehhovisi lakho elikhulu ekudluliseni kahle imiyalezo ebalulekile ngemful
