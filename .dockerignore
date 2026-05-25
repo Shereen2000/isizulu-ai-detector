@@ -1,0 +1,6 @@
+finetuned_classifier/
+base model/
+datasets/
+.claude/
+__pycache__/
+*.pyc

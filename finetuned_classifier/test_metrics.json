@@ -1,0 +1,17 @@
+{
+  "accuracy": 0.9926,
+  "f1": 0.9926,
+  "precision": 0.9873,
+  "recall": 0.998,
+  "f1_human": 0.9926,
+  "f1_machine": 0.9926,
+  "precision_human": 0.998,
+  "recall_human": 0.9872,
+  "roc_auc": 0.9997,
+  "mcc": 0.9852,
+  "tp": 1007,
+  "tn": 1000,
+  "fp": 13,
+  "fn": 2,
+  "total_samples": 2022
+}

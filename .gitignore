@@ -1,0 +1,13 @@
+base model/model/model.safetensors
+finetuned_classifier/checkpoint-*/model.safetensors
+finetuned_classifier/checkpoint-*/optimizer.pt
+finetuned_classifier/checkpoint-*/rng_state.pth
+finetuned_classifier/checkpoint-*/scheduler.pt
+finetuned_classifier/checkpoint-*/training_args.bin
+finetuned_classifier/checkpoint-*/tokenizer.json
+finetuned_classifier/checkpoint-*/tokenizer_config.json
+finetuned_classifier/checkpoint-*/special_tokens_map.json
+finetuned_classifier/final_model/model.safetensors
+.claude/
+__pycache__/
+*.pyc

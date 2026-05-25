@@ -1,0 +1,5 @@
+transformers==4.47.1
+datasets==4.8.5
+accelerate==1.13.0
+scikit-learn==1.7.2
+numpy>=1.24
