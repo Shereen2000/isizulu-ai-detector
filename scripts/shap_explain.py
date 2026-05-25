@@ -86,6 +86,9 @@ print(f"   {len(selected_tp)} TP  |  {len(selected_tn)} TN  |  {len(selected_fp)
 
 # ── Define prediction function for SHAP ──────────────────────────────────────
 def predict(texts_list):
+    if isinstance(texts_list, np.ndarray):
+        texts_list = texts_list.tolist()
+    texts_list = [str(t) for t in texts_list]
     inputs = tokenizer(
         texts_list, truncation=True, padding=True,
         max_length=MAX_LENGTH, return_tensors="pt"

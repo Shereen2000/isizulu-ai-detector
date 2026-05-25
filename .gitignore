@@ -9,5 +9,6 @@ finetuned_classifier/checkpoint-*/tokenizer_config.json
 finetuned_classifier/checkpoint-*/special_tokens_map.json
 finetuned_classifier/final_model/model.safetensors
 .claude/
+shap_outputs/
 __pycache__/
 *.pyc
