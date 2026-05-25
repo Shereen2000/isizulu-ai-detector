@@ -5,7 +5,7 @@ import torch
 import shap
 import matplotlib.pyplot as plt
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 from cleanlab.filter import find_label_issues
 from cleanlab.rank import get_label_quality_scores
 import pandas as pd
@@ -30,7 +30,7 @@ os.makedirs(CLEANLAB_DIR, exist_ok=True)
 
 MAX_LENGTH = 512
 BATCH_SIZE = 16
-N_CORRECT  = 10
+N_CORRECT  = 200
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print("=" * 70)
@@ -93,6 +93,9 @@ tn_idx = np.where((test_labels == 0) & (test_preds == 0))[0]
 fp_idx = np.where((test_labels == 0) & (test_preds == 1))[0]
 fn_idx = np.where((test_labels == 1) & (test_preds == 0))[0]
 print(f"  TP={len(tp_idx)}  TN={len(tn_idx)}  FP={len(fp_idx)}  FN={len(fn_idx)}")
+print("\n  Per-class classification report (test set):")
+print(classification_report(test_labels, test_preds,
+                             target_names=["human", "machine"], digits=4))
 
 rng      = np.random.default_rng(42)
 n_each   = N_CORRECT // 2
@@ -134,6 +137,14 @@ shap.plots.bar(shap_values[:, :, 1], max_display=20, show=False)
 plt.title("Global Feature Importance — Machine Class")
 plt.tight_layout()
 plt.savefig(os.path.join(SHAP_DIR, "global_bar.png"), dpi=150, bbox_inches="tight")
+plt.close()
+
+print("Saving beeswarm plot...")
+plt.figure()
+shap.plots.beeswarm(shap_values[:, :, 1], max_display=20, show=False)
+plt.title("SHAP Beeswarm — Machine Class (all explained samples)")
+plt.tight_layout()
+plt.savefig(os.path.join(SHAP_DIR, "beeswarm.png"), dpi=150, bbox_inches="tight")
 plt.close()
 
 print("Saving per-sample waterfall plots...")
@@ -207,12 +218,25 @@ for split_name, split_path in SPLITS.items():
     print(f"  Mean quality score : {quality_scores.mean():.4f}")
     print(f"  Min  quality score : {quality_scores.min():.4f}")
 
+    preds_local  = np.argmax(probs, axis=1)
+    conf_scores  = probs[np.arange(len(probs)), preds_local]
+    print(f"\n  Prediction confidence (in predicted class):")
+    print(f"    mean={conf_scores.mean():.4f}  median={np.median(conf_scores):.4f}  "
+          f"std={conf_scores.std():.4f}  min={conf_scores.min():.4f}")
+    print(f"    >0.99: {(conf_scores > 0.99).sum()}  "
+          f">0.95: {(conf_scores > 0.95).sum()}  "
+          f"0.90–0.95: {((conf_scores >= 0.90) & (conf_scores <= 0.95)).sum()}  "
+          f"<0.90: {(conf_scores < 0.90).sum()}")
+
     df = pd.DataFrame({
         "index"            : range(len(texts)),
         "given_label"      : labels,
         "given_label_name" : ["human" if l == 0 else "machine" for l in labels],
+        "predicted_label"  : preds_local,
+        "predicted_name"   : ["human" if p == 0 else "machine" for p in preds_local],
         "prob_human"       : probs[:, 0].round(4),
         "prob_machine"     : probs[:, 1].round(4),
+        "confidence"       : conf_scores.round(4),
         "quality_score"    : quality_scores.round(4),
         "flagged"          : [i in label_issues_idx for i in range(len(texts))],
         "text_snippet"     : [t[:120] for t in texts],
@@ -223,21 +247,30 @@ for split_name, split_path in SPLITS.items():
         os.path.join(CLEANLAB_DIR, f"{split_name}_flagged.csv"), index=False)
 
     if n_issues > 0:
-        print(f"\n  Top 5 most suspicious:")
-        top5 = df[df["flagged"]].nsmallest(5, "quality_score")
-        for _, row in top5.iterrows():
-            print(f"    idx={row['index']:5d}  label={row['given_label_name']:7s}  "
+        n_human_flagged   = int((df[df["flagged"]]["given_label"] == 0).sum())
+        n_machine_flagged = int((df[df["flagged"]]["given_label"] == 1).sum())
+        print(f"\n  Flagged by class: human={n_human_flagged}  machine={n_machine_flagged}")
+        print(f"\n  Top 10 most suspicious:")
+        top10 = df[df["flagged"]].nsmallest(10, "quality_score")
+        for _, row in top10.iterrows():
+            print(f"    idx={row['index']:5d}  given={row['given_label_name']:7s}  "
+                  f"pred={row['predicted_name']:7s}  "
                   f"p_human={row['prob_human']:.3f}  p_machine={row['prob_machine']:.3f}  "
                   f"quality={row['quality_score']:.3f}")
-            print(f"    text: {row['text_snippet'][:80]}...")
+            print(f"      text: {row['text_snippet'][:80]}...")
 
     summary_rows.append({
-        "split"             : split_name,
-        "total_samples"     : len(texts),
-        "label_issues"      : n_issues,
-        "issue_pct"         : round(pct, 2),
-        "mean_quality_score": round(float(quality_scores.mean()), 4),
-        "min_quality_score" : round(float(quality_scores.min()),  4),
+        "split"                : split_name,
+        "total_samples"        : len(texts),
+        "label_issues"         : n_issues,
+        "issue_pct"            : round(pct, 2),
+        "human_flagged"        : int((df[df["flagged"]]["given_label"] == 0).sum()),
+        "machine_flagged"      : int((df[df["flagged"]]["given_label"] == 1).sum()),
+        "mean_quality_score"   : round(float(quality_scores.mean()), 4),
+        "min_quality_score"    : round(float(quality_scores.min()),  4),
+        "mean_confidence"      : round(float(conf_scores.mean()),    4),
+        "pct_conf_above_99"    : round(100 * float((conf_scores > 0.99).mean()), 2),
+        "pct_conf_below_90"    : round(100 * float((conf_scores < 0.90).mean()), 2),
     })
 
 print(f"\n{'='*70}")
@@ -257,10 +290,11 @@ print(f"{'='*70}")
 print(f"\nOutputs saved to: {OUTPUT_DIR}")
 print(f"  shap/")
 print(f"    global_bar.png          — top tokens driving machine classification")
+print(f"    beeswarm.png            — distribution of token impacts across all samples")
 print(f"    waterfall_*.png         — per-sample token contributions")
 print(f"    text_FP/FN_*.html       — highlighted token view for error cases")
 print(f"  cleanlab/")
-print(f"    <split>_quality.csv     — quality score for every sample")
-print(f"    <split>_flagged.csv     — only the flagged/suspicious samples")
-print(f"    summary.json            — overall stats per split")
+print(f"    <split>_quality.csv     — quality + confidence score for every sample")
+print(f"    <split>_flagged.csv     — flagged/suspicious samples with predicted labels")
+print(f"    summary.json            — overall stats per split incl. confidence distribution")
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

@@ -6,7 +6,9 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from datasketch import MinHash, MinHashLSH
-from scipy.stats import chi2_contingency
+from scipy.stats import chi2_contingency, mannwhitneyu
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -22,7 +24,7 @@ CLASSES        = {0: "human", 1: "machine"}
 THRESHOLDS     = [0.5, 0.6, 0.7, 0.8, 0.9]
 NUM_PERM       = 128
 NGRAM_SIZE     = 5
-TOP_WORDS      = 30
+TOP_WORDS      = 100
 MIN_VOCAB_FREQ = 5
 CHI2_ALPHA     = 0.05
 OUTPUT_ROOT    = os.path.join(PROJECT_DIR, "dataset_leakage_test")
@@ -174,14 +176,16 @@ for class_id, class_name in CLASSES.items():
             split_rate = round(sc / n_split, 6) if n_split else 0
 
             rows.append({
-                "word"              : word,
-                "compared_split"    : split_name,
-                "train_rate"        : train_rate,
-                f"{split_name}_rate": split_rate,
-                "rate_diff"         : round(abs(train_rate - split_rate), 6),
-                "chi2"              : round(chi2, 4),
-                "p_value"           : round(p, 6),
-                "significant_shift" : p < CHI2_ALPHA,
+                "word"               : word,
+                "compared_split"     : split_name,
+                "train_count"        : tc,
+                f"{split_name}_count": sc,
+                "train_rate"         : train_rate,
+                f"{split_name}_rate" : split_rate,
+                "rate_diff"          : round(abs(train_rate - split_rate), 6),
+                "chi2"               : round(chi2, 4),
+                "p_value"            : round(p, 6),
+                "significant_shift"  : p < CHI2_ALPHA,
             })
 
     df = pd.DataFrame(rows)
@@ -262,6 +266,108 @@ for threshold in THRESHOLDS:
 
     all_threshold_results.append(threshold_summary)
 
+# ── Step 6: Per-class domain similarity (TF-IDF cosine) ──────────────────────
+print(f"\n{'─'*70}")
+print("STEP 6 — Per-class domain similarity (TF-IDF cosine)")
+print(f"{'─'*70}")
+
+all_train_texts = class_data[0]["train"] + class_data[1]["train"]
+vectorizer = TfidfVectorizer(
+    analyzer="char_wb", ngram_range=(3, 5),
+    max_features=50000, sublinear_tf=True
+)
+vectorizer.fit(all_train_texts)
+
+domain_results = {}
+
+for class_id, class_name in CLASSES.items():
+    print(f"\n  Class: {class_name.upper()}")
+
+    split_vectors   = {}
+    split_centroids = {}
+    for split_name in SPLITS:
+        texts = class_data[class_id][split_name]
+        X = vectorizer.transform(texts)
+        split_vectors[split_name]   = X
+        split_centroids[split_name] = np.asarray(X.mean(axis=0))
+
+    print(f"    Cross-split centroid similarity:")
+    cross_split = {}
+    for split_a, split_b in [("train", "eval"), ("train", "test"), ("eval", "test")]:
+        sim = round(float(cosine_similarity(
+            split_centroids[split_a], split_centroids[split_b])[0][0]), 4)
+        cross_split[f"{split_a}↔{split_b}"] = sim
+        label = "same domain" if sim >= 0.9 else "similar" if sim >= 0.7 else "domain shift"
+        print(f"      {split_a}↔{split_b}: {sim:.4f}  ({label})")
+
+    print(f"    Intra-class diversity (full pairwise avg cosine — lower = more diverse):")
+    intra_diversity = {}
+    for split_name in SPLITS:
+        X_split    = split_vectors[split_name]
+        sim_matrix = cosine_similarity(X_split)
+        n = sim_matrix.shape[0]
+        avg_sim = round(float(sim_matrix[np.triu_indices(n, k=1)].mean()), 4)
+        intra_diversity[split_name] = avg_sim
+        label = "low diversity" if avg_sim >= 0.5 else "moderate" if avg_sim >= 0.3 else "high diversity"
+        print(f"      {split_name:5s}: {avg_sim:.4f}  ({n} texts, {n*(n-1)//2} pairs)  ({label})")
+
+    domain_results[class_name] = {
+        "cross_split_centroid_similarity": cross_split,
+        "intra_class_diversity"          : intra_diversity,
+    }
+
+# ── Step 7: Per-class text length distribution across splits ──────────────────
+print(f"\n{'─'*70}")
+print("STEP 7 — Per-class text length distribution across splits")
+print(f"{'─'*70}")
+
+length_results = {}
+
+for class_id, class_name in CLASSES.items():
+    print(f"\n  Class: {class_name.upper()}")
+    out_dir = os.path.join(OUTPUT_ROOT, class_name)
+
+    class_lengths     = {}
+    length_stats_rows = []
+    for split_name in SPLITS:
+        L = np.array([len(t) for t in class_data[class_id][split_name]])
+        class_lengths[split_name] = L
+        length_stats_rows.append({
+            "split" : split_name,
+            "n"     : len(L),
+            "mean"  : round(float(L.mean()), 1),
+            "median": round(float(np.median(L)), 1),
+            "std"   : round(float(L.std()), 1),
+            "min"   : int(L.min()),
+            "p25"   : round(float(np.percentile(L, 25)), 1),
+            "p75"   : round(float(np.percentile(L, 75)), 1),
+            "max"   : int(L.max()),
+        })
+        print(f"    {split_name:5s}: mean={L.mean():.0f}  median={np.median(L):.0f}  "
+              f"std={L.std():.0f}  min={L.min()}  max={L.max()}")
+
+    pd.DataFrame(length_stats_rows).to_csv(
+        os.path.join(out_dir, "length_stats.csv"), index=False)
+
+    print(f"    Mann-Whitney U length shift (two-sided, α={CHI2_ALPHA}):")
+    length_tests = {}
+    for split_a, split_b in [("train", "eval"), ("train", "test"), ("eval", "test")]:
+        stat, p = mannwhitneyu(class_lengths[split_a], class_lengths[split_b],
+                               alternative="two-sided")
+        sig = p < CHI2_ALPHA
+        length_tests[f"{split_a}↔{split_b}"] = {
+            "U_statistic": round(float(stat), 2),
+            "p_value"    : round(float(p), 6),
+            "significant": sig,
+        }
+        print(f"      {split_a}↔{split_b}: p={p:.6f}  "
+              f"{'SIGNIFICANT SHIFT' if sig else 'no significant shift'}")
+
+    length_results[class_name] = {
+        "per_split_stats": length_stats_rows,
+        "shift_tests"    : length_tests,
+    }
+
 # ── Save summary ──────────────────────────────────────────────────────────────
 summary = {
     "ngram_size"              : NGRAM_SIZE,
@@ -272,6 +378,8 @@ summary = {
     "exact_results"           : exact_results,
     "vocab_stability_results" : vocab_stability_results,
     "near_duplicate_results"  : all_threshold_results,
+    "domain_similarity"       : domain_results,
+    "length_distribution"     : length_results,
 }
 
 with open(os.path.join(OUTPUT_ROOT, "leakage_summary.json"), "w") as f:
@@ -408,6 +516,20 @@ disclosed and addressed in the limitations section.
 > Broder, A.Z. (1997). *On the resemblance and containment of documents.*
 > Proceedings of the Compression and Complexity of Sequences (SEQUENCES '97), pp. 21-29. IEEE.
 """)
+
+print(f"\n{'='*70}")
+print("FINAL SUMMARY — PER-CLASS DOMAIN SIMILARITY")
+print(f"{'='*70}")
+for class_name, res in domain_results.items():
+    print(f"\n  Class: {class_name.upper()}")
+    print(f"  Cross-split centroid similarity:")
+    for pair, sim in res["cross_split_centroid_similarity"].items():
+        label = "same domain" if sim >= 0.9 else "similar" if sim >= 0.7 else "domain shift"
+        print(f"    {pair}: {sim:.4f}  ({label})")
+    print(f"  Intra-class diversity:")
+    for split_name, avg_sim in res["intra_class_diversity"].items():
+        label = "low diversity" if avg_sim >= 0.5 else "moderate" if avg_sim >= 0.3 else "high diversity"
+        print(f"    {split_name:5s}: {avg_sim:.4f}  ({label})")
 
 print(f"\nOutputs saved to: {OUTPUT_ROOT}")
 print(f"  human/ machine/          — class-split jsonl files + exact leak CSVs")

@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from datasketch import MinHash, MinHashLSH
-from scipy.stats import chi2_contingency
+from scipy.stats import chi2_contingency, mannwhitneyu
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 
 SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -20,8 +22,8 @@ SPLITS = {
 THRESHOLDS = [0.5, 0.6, 0.7, 0.8, 0.9]
 NUM_PERM   = 128
 NGRAM_SIZE = 5
-TOP_N      = 50
-MIN_FREQ   = 10
+TOP_N      = 100
+MIN_FREQ   = 5
 CHI2_ALPHA = 0.05
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "cross_class_similarity")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -341,6 +343,105 @@ vocab_summary = {
 with open(os.path.join(vocab_dir, "vocab_summary.json"), "w") as f:
     json.dump(vocab_summary, f, indent=2)
 
+# ── Step 4: Cross-class domain similarity (TF-IDF cosine) ────────────────────
+print(f"\n{'─'*70}")
+print("STEP 4 — Cross-class domain similarity (TF-IDF cosine)")
+print(f"{'─'*70}")
+
+all_train_texts = split_data["train"]["human"] + split_data["train"]["machine"]
+vectorizer = TfidfVectorizer(
+    analyzer="char_wb", ngram_range=(3, 5),
+    max_features=50000, sublinear_tf=True
+)
+vectorizer.fit(all_train_texts)
+
+domain_results = {}
+
+for split_name in SPLITS:
+    human_texts   = split_data[split_name]["human"]
+    machine_texts = split_data[split_name]["machine"]
+
+    X_human   = vectorizer.transform(human_texts)
+    X_machine = vectorizer.transform(machine_texts)
+
+    centroid_human   = np.asarray(X_human.mean(axis=0))
+    centroid_machine = np.asarray(X_machine.mean(axis=0))
+
+    cross_sim = round(float(
+        cosine_similarity(centroid_human, centroid_machine)[0][0]), 4)
+
+    sim_h = cosine_similarity(X_human)
+    sim_m = cosine_similarity(X_machine)
+    n_h, n_m = sim_h.shape[0], sim_m.shape[0]
+    avg_human   = round(float(sim_h[np.triu_indices(n_h, k=1)].mean()), 4)
+    avg_machine = round(float(sim_m[np.triu_indices(n_m, k=1)].mean()), 4)
+
+    label = "same domain" if cross_sim >= 0.9 else "similar" if cross_sim >= 0.7 else "domain shift"
+    print(f"\n  {split_name.upper()}: human↔machine cosine = {cross_sim:.4f}  ({label})")
+    print(f"    Human diversity:   {avg_human:.4f}  ({n_h} texts, {n_h*(n_h-1)//2} pairs)  "
+          f"({'low diversity' if avg_human >= 0.5 else 'moderate' if avg_human >= 0.3 else 'high diversity'})")
+    print(f"    Machine diversity: {avg_machine:.4f}  ({n_m} texts, {n_m*(n_m-1)//2} pairs)  "
+          f"({'low diversity' if avg_machine >= 0.5 else 'moderate' if avg_machine >= 0.3 else 'high diversity'})")
+
+    domain_results[split_name] = {
+        "cross_class_centroid_similarity": cross_sim,
+        "intra_class_diversity": {
+            "human"  : avg_human,
+            "machine": avg_machine,
+        },
+    }
+
+# ── Step 5: Text length distribution — human vs machine per split ─────────────
+print(f"\n{'─'*70}")
+print("STEP 5 — Text length: human vs machine per split")
+print(f"{'─'*70}")
+
+length_results   = {}
+all_length_rows  = []
+
+for split_name in SPLITS:
+    human_texts   = split_data[split_name]["human"]
+    machine_texts = split_data[split_name]["machine"]
+    L_h = np.array([len(t) for t in human_texts])
+    L_m = np.array([len(t) for t in machine_texts])
+
+    stat, p = mannwhitneyu(L_h, L_m, alternative="two-sided")
+    sig = p < CHI2_ALPHA
+
+    print(f"\n  {split_name.upper()}:")
+    print(f"    Human  : mean={L_h.mean():.0f}  median={np.median(L_h):.0f}  "
+          f"std={L_h.std():.0f}  min={L_h.min()}  max={L_h.max()}")
+    print(f"    Machine: mean={L_m.mean():.0f}  median={np.median(L_m):.0f}  "
+          f"std={L_m.std():.0f}  min={L_m.min()}  max={L_m.max()}")
+    print(f"    Human vs Machine Mann-Whitney U: p={p:.6f}  "
+          f"{'SIGNIFICANT difference' if sig else 'no significant difference'}")
+
+    for class_name, L in [("human", L_h), ("machine", L_m)]:
+        all_length_rows.append({
+            "split"  : split_name,
+            "class"  : class_name,
+            "n"      : len(L),
+            "mean"   : round(float(L.mean()), 1),
+            "median" : round(float(np.median(L)), 1),
+            "std"    : round(float(L.std()), 1),
+            "min"    : int(L.min()),
+            "p25"    : round(float(np.percentile(L, 25)), 1),
+            "p75"    : round(float(np.percentile(L, 75)), 1),
+            "max"    : int(L.max()),
+        })
+
+    length_results[split_name] = {
+        "human_mean"   : round(float(L_h.mean()), 1),
+        "machine_mean" : round(float(L_m.mean()), 1),
+        "human_median" : round(float(np.median(L_h)), 1),
+        "machine_median": round(float(np.median(L_m)), 1),
+        "mannwhitney_p": round(float(p), 6),
+        "significant"  : sig,
+    }
+
+pd.DataFrame(all_length_rows).to_csv(
+    os.path.join(OUTPUT_DIR, "length_stats.csv"), index=False)
+
 # ── Final summary tables ──────────────────────────────────────────────────────
 print(f"\n{'='*70}")
 print("FINAL SUMMARY — CROSS-CLASS PAIRS BY THRESHOLD")
@@ -373,6 +474,8 @@ summary = {
     "thresholds_tested"   : THRESHOLDS,
     "similarity_results"  : all_threshold_results,
     "vocab_dominance"     : vocab_summary,
+    "domain_similarity"   : domain_results,
+    "length_distribution" : length_results,
 }
 
 with open(os.path.join(OUTPUT_DIR, "cross_class_summary.json"), "w") as f:
@@ -480,6 +583,16 @@ has definitively learned writing style, not word frequency patterns.
 > Broder, A.Z. (1997). *On the resemblance and containment of documents.*
 > Proceedings of the Compression and Complexity of Sequences (SEQUENCES '97), pp. 21–29. IEEE.
 """)
+
+print(f"\n{'='*70}")
+print("FINAL SUMMARY — CROSS-CLASS DOMAIN SIMILARITY")
+print(f"{'='*70}")
+for split_name, res in domain_results.items():
+    sim   = res["cross_class_centroid_similarity"]
+    label = "same domain" if sim >= 0.9 else "similar" if sim >= 0.7 else "domain shift"
+    print(f"  {split_name:5s}: human↔machine = {sim:.4f}  ({label})"
+          f"  |  human div={res['intra_class_diversity']['human']:.4f}"
+          f"  machine div={res['intra_class_diversity']['machine']:.4f}")
 
 print(f"\nOutputs saved to: {OUTPUT_DIR}")
 print(f"  splits/                      — class-split jsonl files per split")
