@@ -1,0 +1,65 @@
+{
+  "near_duplicate_threshold": ">= 70% Jaccard similarity",
+  "ngram_size": 5,
+  "minhash_permutations": 128,
+  "results": [
+    {
+      "class": "human",
+      "pairs": [
+        {
+          "pair": "train\u2194eval",
+          "eval_size": 994,
+          "exact_leaks": 17,
+          "exact_leaks_pct": "1.71%",
+          "near_duplicates": 57,
+          "near_duplicates_pct": "5.73%"
+        },
+        {
+          "pair": "train\u2194test",
+          "test_size": 1013,
+          "exact_leaks": 18,
+          "exact_leaks_pct": "1.78%",
+          "near_duplicates": 114,
+          "near_duplicates_pct": "11.25%"
+        },
+        {
+          "pair": "eval\u2194test",
+          "test_size": 1013,
+          "exact_leaks": 0,
+          "exact_leaks_pct": "0.0%",
+          "near_duplicates": 3,
+          "near_duplicates_pct": "0.3%"
+        }
+      ]
+    },
+    {
+      "class": "machine",
+      "pairs": [
+        {
+          "pair": "train\u2194eval",
+          "eval_size": 997,
+          "exact_leaks": 0,
+          "exact_leaks_pct": "0.0%",
+          "near_duplicates": 47,
+          "near_duplicates_pct": "4.71%"
+        },
+        {
+          "pair": "train\u2194test",
+          "test_size": 1009,
+          "exact_leaks": 0,
+          "exact_leaks_pct": "0.0%",
+          "near_duplicates": 49,
+          "near_duplicates_pct": "4.86%"
+        },
+        {
+          "pair": "eval\u2194test",
+          "test_size": 1009,
+          "exact_leaks": 0,
+          "exact_leaks_pct": "0.0%",
+          "near_duplicates": 11,
+          "near_duplicates_pct": "1.09%"
+        }
+      ]
+    }
+  ]
+}

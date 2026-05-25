@@ -17,10 +17,10 @@ SPLITS = {
 
 CLASSES = {0: "human", 1: "machine"}
 
-OUTPUT_ROOT = os.path.join(PROJECT_DIR, "dataset_leakage_test")
 THRESHOLD   = 0.7
 NUM_PERM    = 128
 NGRAM_SIZE  = 5
+OUTPUT_ROOT = os.path.join(PROJECT_DIR, f"dataset_leakage_test > {THRESHOLD}")
 
 print("=" * 70)
 print("CLASS-LEVEL LEAKAGE DETECTION")
@@ -137,10 +137,18 @@ for class_id, class_name in CLASSES.items():
                 print(f"      Jaccard={row['jaccard_similarity']:.3f}  "
                       f"{split_a}: {row[f'{split_a}_snippet'][:60]}...")
 
+        # Percentage is relative to the split being queried (split_b = eval or test)
+        base = len(texts_b)
+        exact_pct  = round(100 * len(exact_leaks) / base, 2) if base else 0
+        near_pct   = round(100 * len(near_leaks)  / base, 2) if base else 0
+
         class_summary["pairs"].append({
-            "pair"           : f"{split_a}↔{split_b}",
-            "exact_leaks"    : len(exact_leaks),
-            "near_duplicates": len(near_leaks),
+            "pair"                : f"{split_a}↔{split_b}",
+            f"{split_b}_size"     : base,
+            "exact_leaks"         : len(exact_leaks),
+            "exact_leaks_pct"     : f"{exact_pct}%",
+            "near_duplicates"     : len(near_leaks),
+            "near_duplicates_pct" : f"{near_pct}%",
         })
 
     all_summary.append(class_summary)
@@ -152,10 +160,14 @@ print(f"{'='*70}")
 
 for cs in all_summary:
     print(f"\n  Class: {cs['class'].upper()}")
-    print(f"  {'Pair':<15} {'Exact':>8} {'Near-dup (>=' + str(int(THRESHOLD*100)) + '%)':>18}")
-    print(f"  {'─'*43}")
+    print(f"  {'Pair':<15} {'Size':>6} {'Exact':>7} {'Exact%':>8} {'Near-dup(>=' + str(int(THRESHOLD*100)) + '%)':>14} {'Near%':>7}")
+    print(f"  {'─'*63}")
     for p in cs["pairs"]:
-        print(f"  {p['pair']:<15} {p['exact_leaks']:>8} {p['near_duplicates']:>18}")
+        pair_parts = p['pair'].split('↔')
+        size_key = f"{pair_parts[1]}_size"
+        print(f"  {p['pair']:<15} {p.get(size_key, '?'):>6} "
+              f"{p['exact_leaks']:>7} {p['exact_leaks_pct']:>8} "
+              f"{p['near_duplicates']:>14} {p['near_duplicates_pct']:>7}")
 
 summary_path = os.path.join(OUTPUT_ROOT, "class_leakage_summary.json")
 with open(summary_path, "w") as f:
