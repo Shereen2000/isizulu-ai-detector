@@ -140,12 +140,16 @@ plt.savefig(os.path.join(SHAP_DIR, "global_bar.png"), dpi=150, bbox_inches="tigh
 plt.close()
 
 print("Saving beeswarm plot...")
-plt.figure()
-shap.plots.beeswarm(shap_values[:, :, 1], max_display=20, show=False)
-plt.title("SHAP Beeswarm — Machine Class (all explained samples)")
-plt.tight_layout()
-plt.savefig(os.path.join(SHAP_DIR, "beeswarm.png"), dpi=150, bbox_inches="tight")
-plt.close()
+try:
+    plt.figure()
+    shap.plots.beeswarm(shap_values[:, :, 1], max_display=20, show=False)
+    plt.title("SHAP Beeswarm — Machine Class (all explained samples)")
+    plt.tight_layout()
+    plt.savefig(os.path.join(SHAP_DIR, "beeswarm.png"), dpi=150, bbox_inches="tight")
+    plt.close()
+except ValueError as e:
+    plt.close()
+    print(f"  Beeswarm skipped (ragged token lengths across samples): {e}")
 
 print("Saving per-sample waterfall plots...")
 categories = (
