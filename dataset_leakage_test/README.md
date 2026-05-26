@@ -7,7 +7,7 @@ Two complementary checks, both run independently per class (human vs machine):
 **1. Leakage detection** — checks whether the same (or near-identical) text appears
 across splits (train, eval, test). Exact duplicates and near-duplicates at five thresholds.
 
-**2. Within-class vocabulary stability** — checks whether the top 30 most frequent
+**2. Within-class vocabulary stability** — checks whether the top 100 most frequent
 words in each class's training split maintain similar rates in eval and test. If they do,
 the class vocabulary is stable across splits. If they shift, there is domain drift.
 
@@ -21,7 +21,7 @@ the class vocabulary is stable across splits. If they shift, there is domain dri
 | Shingling | Character 5-grams |
 | MinHash permutations | 128 |
 | Exact duplicate method | MD5 hash of lowercased, stripped text |
-| Top words tracked (vocab) | 30 per class |
+| Top words tracked (vocab) | 100 per class |
 | Min word frequency (vocab) | 5 occurrences in train |
 | Significance test (vocab) | Chi-squared (α = 0.05) |
 
@@ -39,7 +39,8 @@ dataset_leakage_test/
 │   ├── vocab_stability.csv             ← within-class word rate stability
 │   └── results/
 │       ├── threshold_0.5/
-│       │   └── near_leak_*.csv
+│       │   ├── intra_*_near_dups.csv   ← intra-split near-dups (within class)
+│       │   └── near_leak_*.csv         ← cross-split near-dups (within class)
 │       ├── threshold_0.6/
 │       ├── threshold_0.7/
 │       ├── threshold_0.8/
@@ -75,7 +76,7 @@ the similarity is loose and unlikely to have influenced the model. If counts sta
 at 0.8–0.9, the similarity is tight and worth disclosing.
 
 ### Within-class vocabulary stability (`vocab_stability.csv`)
-For each class, the top 30 words from train are tracked into eval and test.
+For each class, the top 100 words from train are tracked into eval and test.
 A chi-squared test checks whether each word's usage rate shifted significantly.
 
 | Result | Interpretation |

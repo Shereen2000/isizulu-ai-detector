@@ -11,7 +11,7 @@ texts, so content overlap is expected. The question is: *how much overlap, and t
 how hard was the classification task?*
 
 **2. Vocabulary dominance** — which words appear disproportionately more in one class
-than the other? Identifies the top 50 human-dominant and machine-dominant words in
+than the other? Identifies the top 100 human-dominant and machine-dominant words in
 train, then checks whether those same dominance patterns hold in eval and test.
 
 ---
@@ -23,8 +23,8 @@ train, then checks whether those same dominance patterns hold in eval and test.
 | Thresholds tested | [0.5, 0.6, 0.7, 0.8, 0.9] |
 | Shingling | Character 5-grams |
 | MinHash permutations | 128 |
-| Top N dominant words | 50 per class |
-| Minimum word frequency | 10 occurrences in train |
+| Top N dominant words | 100 per class |
+| Minimum word frequency | 5 occurrences in train |
 | Significance test | Chi-squared (α = 0.05) |
 
 ---

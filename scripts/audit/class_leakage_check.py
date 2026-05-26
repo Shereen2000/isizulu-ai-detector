@@ -79,7 +79,7 @@ for split_name, split_path in SPLITS.items():
     texts, labels = load_split(split_path)
     for class_id, class_name in CLASSES.items():
         class_texts  = [t for t, l in zip(texts, labels) if l == class_id]
-        class_labels = [l for l in labels if l == class_id]
+        class_labels = [class_id] * len(class_texts)
 
         out_dir  = os.path.join(OUTPUT_ROOT, class_name)
         os.makedirs(out_dir, exist_ok=True)
@@ -140,8 +140,74 @@ for class_id, class_name in CLASSES.items():
             "exact_leaks_pct" : f"{pct}%",
         }
 
-# ── Step 4: Within-class vocabulary stability across splits ───────────────────
-print(f"\nSTEP 4 — Within-class vocabulary stability across splits")
+# ── Step 4: Intra-split near-duplicates within each class (all thresholds) ────
+print(f"\nSTEP 4 — Intra-split near-duplicate check within each class (all thresholds)")
+print("─" * 70)
+
+intra_near_results = []
+
+for threshold in THRESHOLDS:
+    print(f"\n  Threshold: {threshold}")
+    threshold_intra = {"threshold": threshold, "classes": []}
+
+    for class_id, class_name in CLASSES.items():
+        out_dir = os.path.join(OUTPUT_ROOT, class_name, "results", f"threshold_{threshold}")
+        os.makedirs(out_dir, exist_ok=True)
+        class_intra = {"class": class_name, "splits": []}
+
+        for split_name in SPLITS:
+            texts  = class_data[class_id][split_name]
+            hashes = minhashes[class_id][split_name]
+            n      = len(texts)
+
+            lsh = MinHashLSH(threshold=threshold, num_perm=NUM_PERM)
+            for i, m in enumerate(hashes):
+                lsh.insert(str(i), m)
+
+            near_dupes = []
+            for i, m in enumerate(hashes):
+                for match_key in lsh.query(m):
+                    j = int(match_key)
+                    if j <= i:
+                        continue
+                    jaccard = round(m.jaccard(hashes[j]), 4)
+                    if jaccard < threshold:
+                        continue
+                    near_dupes.append({
+                        "idx_a"             : i,
+                        "idx_b"             : j,
+                        "jaccard_similarity": jaccard,
+                        "snippet_a"         : texts[i][:100],
+                        "snippet_b"         : texts[j][:100],
+                    })
+
+            n_pairs = n * (n - 1) // 2
+            pct     = round(100 * len(near_dupes) / n_pairs, 4) if n_pairs else 0
+            print(f"    {class_name:7s} / {split_name:5s}: {len(near_dupes)} intra near-dup pairs  "
+                  f"({pct:.4f}% of {n_pairs} pairs)")
+
+            if near_dupes:
+                df = pd.DataFrame(near_dupes).sort_values("jaccard_similarity", ascending=False)
+                df.to_csv(os.path.join(out_dir, f"intra_{split_name}_near_dups.csv"), index=False)
+                print(f"      Top 3:")
+                for _, row in df.head(3).iterrows():
+                    print(f"        Jaccard={row['jaccard_similarity']:.3f}  "
+                          f"a={row['snippet_a'][:55]}…  b={row['snippet_b'][:55]}…")
+
+            class_intra["splits"].append({
+                "split"         : split_name,
+                "n_texts"       : n,
+                "total_pairs"   : n_pairs,
+                "near_dup_pairs": len(near_dupes),
+                "pct_of_pairs"  : f"{pct:.4f}%",
+            })
+
+        threshold_intra["classes"].append(class_intra)
+
+    intra_near_results.append(threshold_intra)
+
+# ── Step 5: Within-class vocabulary stability across splits ───────────────────
+print(f"\nSTEP 5 — Within-class vocabulary stability across splits")
 print("─" * 70)
 
 vocab_stability_results = {}
@@ -207,8 +273,8 @@ for class_id, class_name in CLASSES.items():
 
     vocab_stability_results[class_name] = class_vocab
 
-# ── Step 5: Near-duplicate check per threshold ────────────────────────────────
-print(f"\nSTEP 5 — Near-duplicate check across all thresholds")
+# ── Step 6: Near-duplicate check per threshold ────────────────────────────────
+print(f"\nSTEP 6 — Near-duplicate cross-split check across all thresholds")
 print("─" * 70)
 
 all_threshold_results = []
@@ -266,15 +332,15 @@ for threshold in THRESHOLDS:
 
     all_threshold_results.append(threshold_summary)
 
-# ── Step 6: Per-class domain similarity (TF-IDF cosine) ──────────────────────
+# ── Step 7: Per-class domain similarity (TF-IDF cosine) ──────────────────────
 print(f"\n{'─'*70}")
-print("STEP 6 — Per-class domain similarity (TF-IDF cosine)")
+print("STEP 7 — Per-class domain similarity (TF-IDF cosine)")
 print(f"{'─'*70}")
 
 all_train_texts = class_data[0]["train"] + class_data[1]["train"]
 vectorizer = TfidfVectorizer(
     analyzer="char_wb", ngram_range=(3, 5),
-    max_features=50000, sublinear_tf=True
+    sublinear_tf=True
 )
 vectorizer.fit(all_train_texts)
 
@@ -316,9 +382,9 @@ for class_id, class_name in CLASSES.items():
         "intra_class_diversity"          : intra_diversity,
     }
 
-# ── Step 7: Per-class text length distribution across splits ──────────────────
+# ── Step 8: Per-class text length distribution across splits ──────────────────
 print(f"\n{'─'*70}")
-print("STEP 7 — Per-class text length distribution across splits")
+print("STEP 8 — Per-class text length distribution across splits")
 print(f"{'─'*70}")
 
 length_results = {}
@@ -358,7 +424,7 @@ for class_id, class_name in CLASSES.items():
         length_tests[f"{split_a}↔{split_b}"] = {
             "U_statistic": round(float(stat), 2),
             "p_value"    : round(float(p), 6),
-            "significant": sig,
+            "significant": bool(sig),
         }
         print(f"      {split_a}↔{split_b}: p={p:.6f}  "
               f"{'SIGNIFICANT SHIFT' if sig else 'no significant shift'}")
@@ -370,16 +436,17 @@ for class_id, class_name in CLASSES.items():
 
 # ── Save summary ──────────────────────────────────────────────────────────────
 summary = {
-    "ngram_size"              : NGRAM_SIZE,
-    "minhash_permutations"    : NUM_PERM,
-    "thresholds_tested"       : THRESHOLDS,
-    "vocab_top_words"         : TOP_WORDS,
-    "vocab_min_freq"          : MIN_VOCAB_FREQ,
-    "exact_results"           : exact_results,
-    "vocab_stability_results" : vocab_stability_results,
-    "near_duplicate_results"  : all_threshold_results,
-    "domain_similarity"       : domain_results,
-    "length_distribution"     : length_results,
+    "ngram_size"                   : NGRAM_SIZE,
+    "minhash_permutations"         : NUM_PERM,
+    "thresholds_tested"            : THRESHOLDS,
+    "vocab_top_words"              : TOP_WORDS,
+    "vocab_min_freq"               : MIN_VOCAB_FREQ,
+    "exact_results"                : exact_results,
+    "intra_split_near_duplicates"  : intra_near_results,
+    "cross_split_near_duplicates"  : all_threshold_results,
+    "vocab_stability_results"      : vocab_stability_results,
+    "domain_similarity"            : domain_results,
+    "length_distribution"          : length_results,
 }
 
 with open(os.path.join(OUTPUT_ROOT, "leakage_summary.json"), "w") as f:
@@ -387,7 +454,28 @@ with open(os.path.join(OUTPUT_ROOT, "leakage_summary.json"), "w") as f:
 
 # ── Final summary tables ──────────────────────────────────────────────────────
 print(f"\n{'='*70}")
-print("FINAL SUMMARY — NEAR-DUPLICATES BY THRESHOLD")
+print("FINAL SUMMARY — INTRA-SPLIT NEAR-DUPLICATES BY THRESHOLD")
+print(f"{'='*70}")
+
+for class_name in ["human", "machine"]:
+    print(f"\n  Class: {class_name.upper()}")
+    print(f"  {'Split':<6} {'Pairs':>10} " + " ".join(f"  {t}" for t in THRESHOLDS))
+    print(f"  {'─'*60}")
+    class_id_local = 0 if class_name == "human" else 1
+    for split_name in SPLITS:
+        n = len(class_data[class_id_local][split_name])
+        n_pairs = n * (n - 1) // 2
+        counts = []
+        for tr in intra_near_results:
+            for cs in tr["classes"]:
+                if cs["class"] == class_name:
+                    for s in cs["splits"]:
+                        if s["split"] == split_name:
+                            counts.append(s["near_dup_pairs"])
+        print(f"  {split_name:<6} {n_pairs:>10} " + " ".join(f"{c:>7}" for c in counts))
+
+print(f"\n{'='*70}")
+print("FINAL SUMMARY — CROSS-SPLIT NEAR-DUPLICATES BY THRESHOLD")
 print(f"{'='*70}")
 
 for class_name in ["human", "machine"]:
@@ -462,7 +550,8 @@ dataset_leakage_test/
 │   ├── vocab_stability.csv             ← within-class word rate stability
 │   └── results/
 │       ├── threshold_0.5/
-│       │   └── near_leak_*.csv
+│       │   ├── intra_*_near_dups.csv   ← intra-split near-dups (within class)
+│       │   └── near_leak_*.csv         ← cross-split near-dups (within class)
 │       ├── threshold_0.6/
 │       ├── threshold_0.7/
 │       ├── threshold_0.8/
@@ -532,9 +621,10 @@ for class_name, res in domain_results.items():
         print(f"    {split_name:5s}: {avg_sim:.4f}  ({label})")
 
 print(f"\nOutputs saved to: {OUTPUT_ROOT}")
-print(f"  human/ machine/          — class-split jsonl files + exact leak CSVs")
-print(f"  */vocab_stability.csv    — within-class word rate stability")
-print(f"  */results/threshold_*/   — near-duplicate CSVs per threshold")
+print(f"  human/ machine/                    — class-split jsonl files + exact leak CSVs")
+print(f"  */vocab_stability.csv              — within-class word rate stability")
+print(f"  */results/threshold_*/intra_*.csv  — intra-split near-dup pairs per class/threshold")
+print(f"  */results/threshold_*/near_leak_*  — cross-split near-dup pairs per class/threshold")
 print(f"  leakage_summary.json     — all results in one file")
 print(f"  README.md                — interpretation guide")
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

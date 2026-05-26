@@ -1,0 +1,3 @@
+eval_idx,test_idx,jaccard_similarity,eval_label,test_label,label_match,eval_snippet,test_snippet
+1561,786,0.9141,0,0,True,Kushicililwe e ngalolusuku lomhlaka.............. Ngenyanga ka .....................ku 20....... Uya,Uyaphikisana yini nokuthatha isifungo/ngokufunga njengoba kumisiwe? Ngabe isifungo esigciniwe usitha
+1811,1958,0.8281,1,1,True,"Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi","Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi"

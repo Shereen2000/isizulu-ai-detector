@@ -212,8 +212,9 @@ for split_name, split_path in SPLITS.items():
     )
     quality_scores = get_label_quality_scores(labels=labels, pred_probs=probs)
 
-    n_issues = len(label_issues_idx)
-    pct      = 100 * n_issues / len(texts)
+    n_issues      = len(label_issues_idx)
+    issues_set    = set(label_issues_idx)
+    pct           = 100 * n_issues / len(texts)
     print(f"\n  Label issues found : {n_issues} / {len(texts)}  ({pct:.2f}%)")
     print(f"  Mean quality score : {quality_scores.mean():.4f}")
     print(f"  Min  quality score : {quality_scores.min():.4f}")
@@ -238,7 +239,7 @@ for split_name, split_path in SPLITS.items():
         "prob_machine"     : probs[:, 1].round(4),
         "confidence"       : conf_scores.round(4),
         "quality_score"    : quality_scores.round(4),
-        "flagged"          : [i in label_issues_idx for i in range(len(texts))],
+        "flagged"          : [i in issues_set for i in range(len(texts))],
         "text_snippet"     : [t[:120] for t in texts],
     })
 

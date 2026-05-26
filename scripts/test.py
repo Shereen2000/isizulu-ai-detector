@@ -77,13 +77,12 @@ tn, fp, fn, tp = confusion_matrix(labels, preds, labels=[0, 1]).ravel()
 
 metrics = {
     "accuracy"        : round(accuracy_score(labels, preds),                              4),
-    "f1"              : round(f1_score(labels, preds, average="binary"),                  4),
-    "precision"       : round(precision_score(labels, preds, average="binary"),           4),
-    "recall"          : round(recall_score(labels, preds, average="binary"),              4),
     "f1_human"        : round(f1_score(labels, preds, pos_label=0, average="binary"),     4),
     "f1_machine"      : round(f1_score(labels, preds, pos_label=1, average="binary"),     4),
     "precision_human" : round(precision_score(labels, preds, pos_label=0, average="binary"), 4),
+    "precision_machine": round(precision_score(labels, preds, pos_label=1, average="binary"), 4),
     "recall_human"    : round(recall_score(labels, preds, pos_label=0, average="binary"), 4),
+    "recall_machine"  : round(recall_score(labels, preds, pos_label=1, average="binary"), 4),
     "roc_auc"         : round(roc_auc_score(labels, probs_machine),                       4),
     "mcc"             : round(matthews_corrcoef(labels, preds),                           4),
     "tp"              : int(tp),
@@ -97,15 +96,14 @@ metrics = {
 print("\n" + "=" * 70)
 print("TEST SET RESULTS")
 print("=" * 70)
-print(f"   Accuracy   : {metrics['accuracy']:.4f}  ({metrics['accuracy']*100:.2f}%)")
-print(f"   F1         : {metrics['f1']:.4f}  ({metrics['f1']*100:.2f}%)")
-print(f"   Precision  : {metrics['precision']:.4f}  ({metrics['precision']*100:.2f}%)")
-print(f"   Recall     : {metrics['recall']:.4f}  ({metrics['recall']*100:.2f}%)")
-print(f"   ROC-AUC    : {metrics['roc_auc']:.4f}")
-print(f"   MCC        : {metrics['mcc']:.4f}")
+print(f"   Accuracy          : {metrics['accuracy']:.4f}  ({metrics['accuracy']*100:.2f}%)")
+print(f"   ROC-AUC           : {metrics['roc_auc']:.4f}")
+print(f"   MCC               : {metrics['mcc']:.4f}")
 print()
-print(f"   F1 (human)    : {metrics['f1_human']:.4f}")
-print(f"   F1 (machine)  : {metrics['f1_machine']:.4f}")
+print(f"   {'':20s}  {'Human':>8}  {'Machine':>8}")
+print(f"   {'F1':20s}  {metrics['f1_human']:>8.4f}  {metrics['f1_machine']:>8.4f}")
+print(f"   {'Precision':20s}  {metrics['precision_human']:>8.4f}  {metrics['precision_machine']:>8.4f}")
+print(f"   {'Recall':20s}  {metrics['recall_human']:>8.4f}  {metrics['recall_machine']:>8.4f}")
 print()
 print(f"   Confusion matrix:")
 print(f"                    Predicted")

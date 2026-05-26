@@ -143,9 +143,81 @@ for name in SPLITS:
     minhashes[name] = [make_minhash(t) for t in texts]
     print(f"  {name:5s}: {len(minhashes[name])} hashes computed")
 
-# ── Step 4: Near-duplicate cross-split leakage (all thresholds) ──────────────
+# ── Step 4: Near-duplicate within each split (all thresholds) ─────────────────
 print(f"\n{'─'*70}")
-print("STEP 4 — Near-duplicate cross-split leakage (all thresholds)")
+print("STEP 4 — Near-duplicate intra-split check (all thresholds)")
+print(f"{'─'*70}")
+
+intra_near_summary = []
+
+for threshold in THRESHOLDS:
+    print(f"\n  Threshold: {threshold}")
+    threshold_intra = {"threshold": threshold, "splits": []}
+
+    for split_name in SPLITS:
+        texts  = data[split_name]["texts"]
+        labels = data[split_name]["labels"]
+        hashes = minhashes[split_name]
+        n      = len(texts)
+
+        lsh = MinHashLSH(threshold=threshold, num_perm=NUM_PERM)
+        for i, m in enumerate(hashes):
+            lsh.insert(str(i), m)
+
+        near_dupes = []
+        for i, m in enumerate(hashes):
+            for match_key in lsh.query(m):
+                j = int(match_key)
+                if j <= i:
+                    continue
+                jaccard = round(m.jaccard(hashes[j]), 4)
+                if jaccard < threshold:
+                    continue
+                near_dupes.append({
+                    "idx_a"             : i,
+                    "idx_b"             : j,
+                    "jaccard_similarity": jaccard,
+                    "label_a"           : labels[i],
+                    "label_b"           : labels[j],
+                    "same_label"        : labels[i] == labels[j],
+                    "snippet_a"         : texts[i][:100],
+                    "snippet_b"         : texts[j][:100],
+                })
+
+        n_pairs    = n * (n - 1) // 2
+        same_label = sum(1 for r in near_dupes if r["same_label"])
+        diff_label = len(near_dupes) - same_label
+        pct        = round(100 * len(near_dupes) / n_pairs, 4) if n_pairs else 0
+        print(f"    {split_name:5s}: {len(near_dupes)} near-dup pairs  "
+              f"(same_label={same_label}  diff_label={diff_label}  "
+              f"{pct:.4f}% of {n_pairs} pairs)")
+
+        if near_dupes:
+            out_dir = os.path.join(OUTPUT_DIR, f"threshold_{threshold}")
+            os.makedirs(out_dir, exist_ok=True)
+            df = pd.DataFrame(near_dupes).sort_values("jaccard_similarity", ascending=False)
+            df.to_csv(os.path.join(out_dir, f"intra_{split_name}_near_dups.csv"), index=False)
+            print(f"      Top 3 most similar:")
+            for _, row in df.head(3).iterrows():
+                print(f"        Jaccard={row['jaccard_similarity']:.3f}  "
+                      f"labels={row['label_a']}↔{row['label_b']}  "
+                      f"same_label={row['same_label']}")
+
+        threshold_intra["splits"].append({
+            "split"         : split_name,
+            "n_texts"       : n,
+            "total_pairs"   : n_pairs,
+            "near_dup_pairs": len(near_dupes),
+            "same_label"    : same_label,
+            "diff_label"    : diff_label,
+            "pct_of_pairs"  : f"{pct:.4f}%",
+        })
+
+    intra_near_summary.append(threshold_intra)
+
+# ── Step 5: Near-duplicate cross-split leakage (all thresholds) ──────────────
+print(f"\n{'─'*70}")
+print("STEP 5 — Near-duplicate cross-split leakage (all thresholds)")
 print(f"{'─'*70}")
 
 near_leakage_summary = []
@@ -206,9 +278,9 @@ for threshold in THRESHOLDS:
 
     near_leakage_summary.append(threshold_result)
 
-# ── Step 5: General vocabulary distribution across splits ─────────────────────
+# ── Step 6: General vocabulary distribution across splits ─────────────────────
 print(f"\n{'─'*70}")
-print("STEP 5 — General vocabulary distribution (train → eval/test)")
+print("STEP 6 — General vocabulary distribution (train → eval/test)")
 print(f"{'─'*70}")
 
 train_texts = data["train"]["texts"]
@@ -268,14 +340,14 @@ for split_name in ["eval", "test"]:
 vocab_df = pd.DataFrame(vocab_rows)
 vocab_df.to_csv(os.path.join(OUTPUT_DIR, "vocab_distribution.csv"), index=False)
 
-# ── Step 6: Domain similarity across splits (class-blind) ─────────────────────
+# ── Step 7: Domain similarity across splits (class-blind) ─────────────────────
 print(f"\n{'─'*70}")
-print("STEP 6 — Domain similarity across splits (TF-IDF cosine, full pairwise)")
+print("STEP 7 — Domain similarity across splits (TF-IDF cosine, full pairwise)")
 print(f"{'─'*70}")
 
 vectorizer = TfidfVectorizer(
     analyzer="char_wb", ngram_range=(3, 5),
-    max_features=50000, sublinear_tf=True
+    sublinear_tf=True
 )
 vectorizer.fit(data["train"]["texts"])
 
@@ -311,9 +383,9 @@ domain_results = {
     "intra_split_diversity"          : intra_diversity,
 }
 
-# ── Step 7: Text length distribution across splits ────────────────────────────
+# ── Step 8: Text length distribution across splits ────────────────────────────
 print(f"\n{'─'*70}")
-print("STEP 7 — Text length distribution across splits")
+print("STEP 8 — Text length distribution across splits")
 print(f"{'─'*70}")
 
 split_lengths     = {}
@@ -348,7 +420,7 @@ for split_a, split_b in [("train", "eval"), ("train", "test"), ("eval", "test")]
     length_tests[f"{split_a}↔{split_b}"] = {
         "U_statistic": round(float(stat), 2),
         "p_value"    : round(float(p), 6),
-        "significant": sig,
+        "significant": bool(sig),
     }
     print(f"    {split_a}↔{split_b}: p={p:.6f}  "
           f"{'SIGNIFICANT length shift' if sig else 'no significant shift'}")
@@ -367,6 +439,7 @@ summary = {
     "vocab_min_freq"              : MIN_VOCAB_FREQ,
     "intra_split_exact_duplicates": intra_results,
     "cross_split_exact_leakage"   : exact_leakage_summary,
+    "intra_split_near_duplicates" : intra_near_summary,
     "cross_split_near_duplicates" : near_leakage_summary,
     "vocab_distribution"          : vocab_results,
     "domain_similarity"           : domain_results,
@@ -390,6 +463,19 @@ print("\nCross-split exact leakage:")
 for r in exact_leakage_summary:
     print(f"  {r['pair']:15s}: {r['exact_leaks']} — "
           f"{'CLEAN' if r['exact_leaks'] == 0 else 'LEAKAGE FOUND'}")
+
+print(f"\nIntra-split near-duplicates by threshold (same split):")
+print(f"  {'Split':<6} {'Pairs':>10} " + " ".join(f"  {t}" for t in THRESHOLDS))
+print(f"  {'─'*70}")
+for split_name in SPLITS:
+    n = len(data[split_name]["texts"])
+    n_pairs = n * (n - 1) // 2
+    counts = []
+    for tr in intra_near_summary:
+        for s in tr["splits"]:
+            if s["split"] == split_name:
+                counts.append(s["near_dup_pairs"])
+    print(f"  {split_name:<6} {n_pairs:>10} " + " ".join(f"{c:>7}" for c in counts))
 
 print(f"\nCross-split near-duplicates by threshold:")
 print(f"  {'Pair':<15} {'Size':>6} " + " ".join(f"  {t}" for t in THRESHOLDS))
@@ -422,9 +508,10 @@ for split_name, avg_sim in domain_results["intra_split_diversity"].items():
     print(f"  {split_name:5s}: {avg_sim:.4f}  ({label})")
 
 print(f"\nOutputs saved to: {OUTPUT_DIR}")
-print(f"  *_intra_duplicates.csv          — exact duplicates within same split")
-print(f"  exact_leak_*.csv                — exact cross-split leaks")
-print(f"  threshold_*/near_leak_*.csv     — near-duplicate pairs per threshold")
+print(f"  *_intra_duplicates.csv                  — exact duplicates within same split")
+print(f"  exact_leak_*.csv                        — exact cross-split leaks")
+print(f"  threshold_*/intra_*_near_dups.csv       — intra-split near-dup pairs per threshold")
+print(f"  threshold_*/near_leak_*.csv             — cross-split near-duplicate pairs per threshold")
 print(f"  vocab_distribution.csv          — top {TOP_WORDS} train words tracked into eval/test")
 print(f"  leakage_summary.json            — all results in one file")
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

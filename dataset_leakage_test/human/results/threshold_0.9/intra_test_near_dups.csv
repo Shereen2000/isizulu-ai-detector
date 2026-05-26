@@ -1,0 +1,15 @@
+idx_a,idx_b,jaccard_similarity,snippet_a,snippet_b
+251,359,1.0,"Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yiz","Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yiz"
+234,956,1.0,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l
+631,747,1.0,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-
+659,792,1.0,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba ","Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba "
+567,631,1.0,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-
+567,747,1.0,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-,Ngifisa ukuniqinisekisa ukuthi ososayensi benza konke okusemndleni emhlabeni wonke besebenzisana ne-
+659,890,1.0,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba ","Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba "
+792,890,1.0,"Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba ","Ngenhlanhla, yize lokhu kunje, iphinde yasho ukuthi abantu abaningi abatheleleke ngevayirasi bazoba "
+218,818,0.9844,"Ngale kweqhaza lokuhlela olwenziwe phambilini, uhlelo lwentuthuko edidiyele selubonakala njengomsebe","Ngale kweqhaza lokuhlela olwenziwe phambilini, uhlelo lwentuthuko edidiyele selubonakala njengomsebe"
+207,956,0.9766,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l
+207,234,0.9766,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l,Ukuhlolwa kuzokwenziwa ngesincomo sikadokotela. Iziguli ezidinga ukwelashwa ohlelweni lukahulumeni l
+251,312,0.9688,"Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yiz","E-Afrika, kuze kube manje le vayirasi isisabalalele emazweni ayi-16 kuphela. Ngalesi sikhathi sokubh"
+312,359,0.9688,"E-Afrika, kuze kube manje le vayirasi isisabalalele emazweni ayi-16 kuphela. Ngalesi sikhathi sokubh","Ngalesi sikhathi sokubhala le ncwadi, le vayirasi isisulele abantu abayi-177 457 (abaqinisekiswe yiz"
+293,706,0.9609,Uhulumeni weNdawo uneqhaza eliphakeme ezinhlelweni zentuthuko lapha eNingizimu Afrika. Uhlelo lwezin,Uhulumeni weNdawo uneqhaza eliphakeme ezinhlelweni zentuthuko lapha eNingizimu Afrika. Uhlelo lwezin

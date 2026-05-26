@@ -156,6 +156,8 @@ for threshold in THRESHOLDS:
             df.to_csv(os.path.join(out_dir, f"{split_name}_cross_class_pairs.csv"), index=False)
 
             buckets = {
+                "0.50–0.59": int(((df["jaccard_similarity"] >= 0.50) & (df["jaccard_similarity"] < 0.60)).sum()),
+                "0.60–0.69": int(((df["jaccard_similarity"] >= 0.60) & (df["jaccard_similarity"] < 0.70)).sum()),
                 "0.70–0.79": int(((df["jaccard_similarity"] >= 0.70) & (df["jaccard_similarity"] < 0.80)).sum()),
                 "0.80–0.89": int(((df["jaccard_similarity"] >= 0.80) & (df["jaccard_similarity"] < 0.90)).sum()),
                 "0.90–0.99": int(((df["jaccard_similarity"] >= 0.90) & (df["jaccard_similarity"] < 1.00)).sum()),
@@ -292,7 +294,7 @@ for split_name in ["eval", "test"]:
             "human_rate"                  : human_rate,
             "machine_rate"                : machine_rate,
             f"{split_name}_dominant_class": dominant_in_split,
-            "consistent_with_train"       : dominant_in_split == train_dominant,
+            "consistent_with_train"       : dominant_in_split == train_dominant or dominant_in_split == "equal",
         })
 
     df = pd.DataFrame(rows)
@@ -351,7 +353,7 @@ print(f"{'─'*70}")
 all_train_texts = split_data["train"]["human"] + split_data["train"]["machine"]
 vectorizer = TfidfVectorizer(
     analyzer="char_wb", ngram_range=(3, 5),
-    max_features=50000, sublinear_tf=True
+    sublinear_tf=True
 )
 vectorizer.fit(all_train_texts)
 
@@ -436,7 +438,7 @@ for split_name in SPLITS:
         "human_median" : round(float(np.median(L_h)), 1),
         "machine_median": round(float(np.median(L_m)), 1),
         "mannwhitney_p": round(float(p), 6),
-        "significant"  : sig,
+        "significant"  : bool(sig),
     }
 
 pd.DataFrame(all_length_rows).to_csv(
