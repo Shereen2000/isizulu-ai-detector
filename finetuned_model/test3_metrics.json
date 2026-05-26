@@ -1,0 +1,16 @@
+{
+  "accuracy": 0.9821,
+  "f1_human": 0.9836,
+  "f1_machine": 0.9804,
+  "precision_human": 1.0,
+  "precision_machine": 0.9615,
+  "recall_human": 0.9677,
+  "recall_machine": 1.0,
+  "roc_auc": 1.0,
+  "mcc": 0.9646,
+  "tp": 100,
+  "tn": 120,
+  "fp": 4,
+  "fn": 0,
+  "total_samples": 224
+}

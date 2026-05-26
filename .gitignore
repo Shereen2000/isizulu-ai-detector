@@ -11,6 +11,6 @@ finetuned_model/final_model/model.safetensors
 .claude/
 __pycache__/
 *.pyc
-# dataset_leakage_test/human/*.jsonl
-# dataset_leakage_test/machine/*.jsonl
-# cross_class_similarity/splits/
+dataset_leakage_test/human/*.jsonl
+dataset_leakage_test/machine/*.jsonl
+cross_class_similarity/splits/
