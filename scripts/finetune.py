@@ -42,10 +42,8 @@ SEED          = 42
 # LOAD DATASET
 # ============================================================================
 
-print("=" * 70)
 print("ISIZULU AI-DETECTION CLASSIFIER  —  FINE-TUNING")
 print("  Label 1 = machine-written  |  Label 0 = human-written")
-print("=" * 70)
 
 def load_jsonl(path):
     texts, labels = [], []
@@ -132,24 +130,24 @@ def compute_metrics(eval_pred):
     tn, fp, fn, tp = confusion_matrix(labels, preds, labels=[0, 1]).ravel()
 
     return {
-        # ── Performance ──────────────────────────────────────────────────
+        # Performance
         "accuracy"       : accuracy_score(labels, preds),
         "f1"             : f1_score(labels, preds, average="binary"),
         "precision"      : precision_score(labels, preds, average="binary"),
         "recall"         : recall_score(labels, preds, average="binary"),
-        # ── Per-class ────────────────────────────────────────────────────
+        # Per-class
         "f1_human"       : f1_score(labels, preds, pos_label=0, average="binary"),
         "f1_machine"     : f1_score(labels, preds, pos_label=1, average="binary"),
         "precision_human": precision_score(labels, preds, pos_label=0, average="binary"),
         "recall_human"   : recall_score(labels, preds, pos_label=0, average="binary"),
-        # ── Calibration / ranking ────────────────────────────────────────
+        # Calibration / ranking
         "roc_auc"        : roc_auc_score(labels, probs_machine),
         "mcc"            : matthews_corrcoef(labels, preds),
-        # ── Confusion matrix counts ───────────────────────────────────────
-        "tp"             : int(tp),   # machine predicted machine  ✓
-        "tn"             : int(tn),   # human   predicted human    ✓
-        "fp"             : int(fp),   # human   predicted machine  ✗
-        "fn"             : int(fn),   # machine predicted human    ✗
+        # Confusion matrix counts 
+        "tp"             : int(tp),   # machine predicted machine  
+        "tn"             : int(tn),   # human   predicted human    
+        "fp"             : int(fp),   # human   predicted machine  
+        "fn"             : int(fn),   # machine predicted human    
     }
 
 # ============================================================================
@@ -195,16 +193,14 @@ trainer = Trainer(
     callbacks=[EarlyStoppingCallback(early_stopping_patience=2)],
 )
 
-print(f"\nStarting training ({EPOCHS} epochs, early stopping patience=2)...\n")
+print(f"\nStarting training ({EPOCHS} epochs, early stopping patience=2)\n")
 trainer.train()
 
 # ============================================================================
 # SAVE & EVALUATE
 # ============================================================================
 
-print("\n" + "=" * 70)
 print("TRAINING COMPLETE")
-print("=" * 70)
 
 final_path = os.path.join(OUTPUT_DIR, "final_model")
 model.save_pretrained(final_path)
