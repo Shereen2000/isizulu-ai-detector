@@ -29,10 +29,9 @@ Early stopping (patience=2) halted training after epoch 4 since no epoch exceede
 
 All splits use the same format — one JSON object per line:
 
-```json
-{"text": "Umculo udlala indima ebalulekile...", "label": 0}
-{"text": "Awu mngani, waze wangitshela...", "label": 1}
-```
+## json
+{"text": "Umculo udlala indima ebalulekile", "label": 0}
+{"text": "Awu mngani, waze wangitshela", "label": 1}
 
 | Split | Total  | Label 0 (human) | Label 1 (machine) |
 |-------|--------|-----------------|-------------------|
