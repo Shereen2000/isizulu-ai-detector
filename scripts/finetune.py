@@ -2,6 +2,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 import os
 import json
+import subprocess
 from datetime import datetime
 import gdown
 
@@ -233,3 +234,7 @@ print(f"\nMetrics saved to: {metrics_path}")
 
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print(f"Output directory: {OUTPUT_DIR}")
+
+print("---------------------------------------------------------------------")
+print("Starting test")
+subprocess.run(["python3", os.path.join(SCRIPT_DIR, "test.py")], check=True)

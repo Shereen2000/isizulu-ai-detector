@@ -10,4 +10,8 @@ services:
       - "./base_model:/app/base_model"
       - "./datasets:/app/datasets:ro"
       - "./finetuned_model:/app/finetuned_model"
+      - "./model_audit:/app/model_audit"
+    # Train (runs tests automatically at the end):
     command: python3 scripts/finetune.py
+    # Inference only (comment out the line above and uncomment below):
+    # command: python3 scripts/test.py
