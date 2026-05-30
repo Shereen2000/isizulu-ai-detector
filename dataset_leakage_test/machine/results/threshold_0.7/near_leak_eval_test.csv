@@ -1,5 +1,0 @@
-eval_idx,test_idx,jaccard_similarity,eval_snippet,test_snippet
-910,975,0.8281,"Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi","Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi"
-71,782,0.7812,Imicimbi yokuphepha nemisebenzi ye-ofisi... Ukucubungula kwezezimali ngaphakathi. Ukuphathwa kwezins,Izenzakalo zokuphepha nemisebenzi ye-ofisi... Ukuhlela kwezimali ngaphakathi. Ukuphathwa kwezinsiza 
-65,658,0.7734,"Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi ahlinzeka ngosizo olubalulekile ","Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi anikeza usizo olubalulekile kuba"
-976,307,0.7266,"Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizimele ezikhungweni zobuciko bendawo. Lokhu ","Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizinkulu ezihlanganyela nezobuciko bendawo. L"

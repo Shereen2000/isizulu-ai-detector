@@ -1,7 +1,0 @@
-eval_idx,test_idx,jaccard_similarity,eval_label,test_label,label_match,eval_snippet,test_snippet
-1561,786,0.9141,0,0,True,Kushicililwe e ngalolusuku lomhlaka.............. Ngenyanga ka .....................ku 20....... Uya,Uyaphikisana yini nokuthatha isifungo/ngokufunga njengoba kumisiwe? Ngabe isifungo esigciniwe usitha
-507,1433,0.8594,0,0,True,Qaphela: 1. Imibhalosifungo eyenziwe ngabanye abantu noma amanye amaphepha okufakazela udaba kufanel,Qaphela: 1. Imibhalosifungo eyenziwe ngabanye abantu noma amanye amaphepha okufakazela udaba kufanel
-1811,1958,0.8281,1,1,True,"Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi","Thina, njengabasebenzi boMnyango wezobuciko namasiko, sithole izinsiza ezahlukene zik government ezi"
-150,1578,0.7812,1,1,True,Imicimbi yokuphepha nemisebenzi ye-ofisi... Ukucubungula kwezezimali ngaphakathi. Ukuphathwa kwezins,Izenzakalo zokuphepha nemisebenzi ye-ofisi... Ukuhlela kwezimali ngaphakathi. Ukuphathwa kwezinsiza 
-137,1320,0.7734,1,1,True,"Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi ahlinzeka ngosizo olubalulekile ","Hey, Umshayeli weTaxi! B. Bheka amawheels akho! b. Bangane, amaTaxi anikeza usizo olubalulekile kuba"
-1944,612,0.7266,1,1,True,"Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizimele ezikhungweni zobuciko bendawo. Lokhu ","Ngale ndlela, uhulumeni uqale ukuhlinzeka ngezinsiza ezizinkulu ezihlanganyela nezobuciko bendawo. L"

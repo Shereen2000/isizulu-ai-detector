@@ -1,4 +1,0 @@
-train_idx,test_idx,jaccard_similarity,train_snippet,test_snippet
-7520,511,0.9531,Sizoletha induduzo kulabo. Sibuza ukuthi izindlela zokwelashwa noma zokubuyiselwa zibhujiswe noma za,Sizoletha induduzo kulabo. Sibuza ukuthi izindlela zokwelapha noma zokubuyiselwa zibhujiswe noma zap
-4328,203,0.8594,Yiziphi izinzuzo zokuba yilungu leli qembu lokufunda? Ngithole isimanga esikhulu lapho ngiya ukubona,Yiziphi izinzuzo zokuba yilungu leli qembu lokufunda? Ngithole ukumangala okukhulu lapho ngiya ukubo
-1574,723,0.8438,"Umfuyi ovela eFouriesburg uphumelele, ungumkhiqizi ophawulekayo! Umfuyi ophumelele emncintiswaneni y","Umfuyi ophuma eFouriesburg uphumelele, ungumkhiqizi ophawulekayo! Umfuyi ophumelele emncintiswaneni "

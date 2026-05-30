@@ -1,6 +1,5 @@
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-
 import os
 import json
 from datetime import datetime
@@ -34,7 +33,7 @@ OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_model")
 
 MAX_LENGTH    = 512
 BATCH_SIZE    = 8
-GRAD_ACCUM    = 4           # effective batch = 32
+GRAD_ACCUM    = 4      
 LEARNING_RATE = 2e-5
 EPOCHS        = 5
 SEED          = 42
