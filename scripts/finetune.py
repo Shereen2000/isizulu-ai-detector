@@ -3,6 +3,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 import os
 import json
 from datetime import datetime
+import gdown
 
 import torch
 import numpy as np
@@ -28,12 +29,25 @@ TRAIN_PATH   = os.path.join(PROJECT_DIR, "datasets", "train.jsonl")
 EVAL_PATH    = os.path.join(PROJECT_DIR, "datasets", "eval.jsonl")
 OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_model")
 
+SAFETENSORS_FILE_ID = "1RjJqRRIz7KS6oPphXVFeQWcFigp2oaHo"
+
 MAX_LENGTH    = 512
 BATCH_SIZE    = 8
 GRAD_ACCUM    = 4      
 LEARNING_RATE = 2e-5
 EPOCHS        = 5
 SEED          = 42
+
+def download_base_model_weights():
+    dest = os.path.join(MODEL_PATH, "model.safetensors")
+    if os.path.exists(dest):
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] model.safetensors already exists, skipping download")
+        return
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Downloading model.safetensors into {MODEL_PATH}")
+    gdown.download(id=SAFETENSORS_FILE_ID, output=dest, quiet=False)
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Download complete")
+
+download_base_model_weights()
 
 # LOAD DATASET
 print("ISIZULU AI-DETECTION CLASSIFIER  —  FINE-TUNING")
