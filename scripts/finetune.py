@@ -19,10 +19,7 @@ from sklearn.metrics import (
     matthews_corrcoef, roc_auc_score, confusion_matrix,
 )
 
-# ============================================================================
 # CONFIGURATION
-# ============================================================================
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 
@@ -38,10 +35,7 @@ LEARNING_RATE = 2e-5
 EPOCHS        = 5
 SEED          = 42
 
-# ============================================================================
 # LOAD DATASET
-# ============================================================================
-
 print("ISIZULU AI-DETECTION CLASSIFIER  —  FINE-TUNING")
 print("  Label 1 = machine-written  |  Label 0 = human-written")
 
@@ -71,10 +65,7 @@ eval_dataset  = Dataset.from_dict({"text": eval_texts,  "label": eval_labels}).c
 print(f"   Training samples  : {len(train_dataset)}  (0: {train_labels.count(0)}, 1: {train_labels.count(1)})")
 print(f"   Evaluation samples: {len(eval_dataset)}   (0: {eval_labels.count(0)}, 1: {eval_labels.count(1)})")
 
-# ============================================================================
 # LOAD TOKENIZER & MODEL
-# ============================================================================
-
 print(f"\nLoading model from: {MODEL_PATH}")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 print("   Tokenizer loaded")
@@ -93,9 +84,7 @@ print(f"   Device: {device}")
 
 
 # TOKENIZE
-# =====================
-
-print(f"\nTokenizing (max_length={MAX_LENGTH})...")
+print(f"\nTokenizing (max_length={MAX_LENGTH})")
 
 def preprocess(examples):
     return tokenizer(
@@ -118,8 +107,6 @@ train_eval_dataset = train_dataset.select(subset_idx)
 print(f"   Tokenization complete")
 
 # METRICS
-# ===================
-
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
@@ -150,9 +137,7 @@ def compute_metrics(eval_pred):
     }
 
 # TRAINING ARGUMENTS
-# ===========================
-
-print("\nConfiguring training arguments...")
+print("\nConfiguring training arguments")
 
 training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
@@ -179,8 +164,6 @@ training_args = TrainingArguments(
 
 
 # TRAINER
-# ====================
-
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -196,8 +179,6 @@ trainer.train()
 
 
 # SAVE & EVALUATE
-# ========================
-
 print("TRAINING COMPLETE")
 
 final_path = os.path.join(OUTPUT_DIR, "final_model")
@@ -205,12 +186,12 @@ model.save_pretrained(final_path)
 tokenizer.save_pretrained(final_path)
 print(f"Final model saved to: {final_path}")
 
-print("\nRunning final evaluation on eval set...")
+print("\nRunning final evaluation on eval set")
 eval_results        = trainer.evaluate(eval_dataset=eval_dataset,        metric_key_prefix="eval")
-print("\nRunning final evaluation on train subset...")
+print("\nRunning final evaluation on train subset")
 train_eval_results  = trainer.evaluate(eval_dataset=train_eval_dataset,  metric_key_prefix="train")
 
-print("\n── Eval set ──────────────────────────────────────")
+print("\nEval set ──")
 print(f"   Loss      : {eval_results['eval_loss']:.4f}")
 print(f"   Accuracy  : {eval_results['eval_accuracy']:.4f}")
 print(f"   F1        : {eval_results['eval_f1']:.4f}")
@@ -220,7 +201,7 @@ print(f"   ROC-AUC   : {eval_results['eval_roc_auc']:.4f}")
 print(f"   MCC       : {eval_results['eval_mcc']:.4f}")
 print(f"   TP/TN/FP/FN: {eval_results['eval_tp']} / {eval_results['eval_tn']} / {eval_results['eval_fp']} / {eval_results['eval_fn']}")
 
-print("\n── Train subset (overfitting check) ──────────────")
+print("\nTrain subset (overfitting check) ──")
 print(f"   Loss      : {train_eval_results['train_loss']:.4f}")
 print(f"   Accuracy  : {train_eval_results['train_accuracy']:.4f}")
 print(f"   F1        : {train_eval_results['train_f1']:.4f}")
