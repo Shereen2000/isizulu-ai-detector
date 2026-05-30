@@ -25,36 +25,6 @@ Training ran for 4 epochs (22 minutes on an RTX 5090) before early stopping trig
 
 Early stopping (patience=2) halted training after epoch 4 since no epoch exceeded the epoch 2 F1 score.
 
-## Project Structure
-project/
-├── base model/
-│   └── model/                    # AfroXLMR-Large-29L base model weights
-│       ├── config.json
-│       ├── model.safetensors     # 2.24 GB
-│       ├── tokenizer.json
-│       ├── tokenizer_config.json
-│       └── special_tokens_map.json
-├── datasets/
-│   ├── train.jsonl               # 16,377 samples
-│   ├── eval.jsonl                # 1,991 samples
-│   └── test.jsonl                # 2,022 samples
-├── scripts/
-│   └── finetune.py               # Main training script
-├── finetuned_classifier/
-│   ├── final_model/              # Best checkpoint (epoch 2), saved here
-│   ├── checkpoint-1556/          # End of epoch 1
-│   ├── checkpoint-3112/          # End of epoch 2 (best)
-│   ├── checkpoint-4668/          # End of epoch 3
-│   ├── checkpoint-6224/          # End of epoch 4
-│   └── metrics.json              # Final evaluation metrics
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
-
----
-
 ## Dataset
 
 All splits use the same format — one JSON object per line:
