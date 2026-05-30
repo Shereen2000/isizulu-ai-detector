@@ -33,19 +33,17 @@ BATCH_SIZE = 16
 N_CORRECT  = 200
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-print("=" * 70)
 print("MODEL AUDIT — SHAP EXPLAINABILITY + CLEANLAB LABEL QUALITY")
 print(f"  Device : {DEVICE}")
-print("=" * 70)
 
-# ── Load model (shared) ───────────────────────────────────────────────────────
-print(f"\nLoading model from {MODEL_PATH}...")
+# Load model (shared)
+print(f"\nLoading model from {MODEL_PATH}")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model     = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH).to(DEVICE)
 model.eval()
 print("  Model loaded.")
 
-# ── Shared helpers ────────────────────────────────────────────────────────────
+# Shared helpers
 def load_jsonl(path):
     texts, labels = [], []
     with open(path, "r", encoding="utf-8") as f:
@@ -76,14 +74,12 @@ def get_probs(texts):
 
 label_map = {0: "human", 1: "machine"}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PART 1 — SHAP EXPLAINABILITY
-# ══════════════════════════════════════════════════════════════════════════════
 print(f"\n{'='*70}")
 print("PART 1 — SHAP EXPLAINABILITY")
 print(f"{'='*70}")
 
-print("\nLoading test set and running inference...")
+print("\nLoading test set and running inference")
 test_texts, test_labels = load_jsonl(TEST_PATH)
 test_probs = get_probs(test_texts)
 test_preds = np.argmax(test_probs, axis=1)
@@ -93,7 +89,7 @@ tn_idx = np.where((test_labels == 0) & (test_preds == 0))[0]
 fp_idx = np.where((test_labels == 0) & (test_preds == 1))[0]
 fn_idx = np.where((test_labels == 1) & (test_preds == 0))[0]
 print(f"  TP={len(tp_idx)}  TN={len(tn_idx)}  FP={len(fp_idx)}  FN={len(fn_idx)}")
-print("\n  Per-class classification report (test set):")
+print("\n  Per class classification report (test set):")
 print(classification_report(test_labels, test_preds,
                              target_names=["human", "machine"], digits=4))
 
@@ -124,14 +120,14 @@ def predict(texts_list):
         logits = model(**inputs).logits
     return torch.softmax(logits, dim=-1).cpu().numpy()
 
-print("\nInitialising SHAP explainer...")
+print("\nInitialising SHAP explainer")
 masker    = shap.maskers.Text(tokenizer)
 explainer = shap.Explainer(predict, masker, output_names=["human", "machine"])
 
-print(f"Computing SHAP values — this may take a while...")
+print(f"Computing SHAP values — this may take a while")
 shap_values = explainer(explain_texts)
 
-print("Saving global bar plot...")
+print("Saving global bar plot")
 plt.figure()
 shap.plots.bar(shap_values[:, :, 1], max_display=20, show=False)
 plt.title("Global Feature Importance — Machine Class")
@@ -139,7 +135,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(SHAP_DIR, "global_bar.png"), dpi=150, bbox_inches="tight")
 plt.close()
 
-print("Saving beeswarm plot...")
+print("Saving beeswarm plot")
 try:
     plt.figure()
     shap.plots.beeswarm(shap_values[:, :, 1], max_display=20, show=False)
@@ -151,7 +147,7 @@ except ValueError as e:
     plt.close()
     print(f"  Beeswarm skipped (ragged token lengths across samples): {e}")
 
-print("Saving per-sample waterfall plots...")
+print("Saving per sample waterfall plots")
 categories = (
     [(i, "TP") for i in range(len(sel_tp))] +
     [(i + len(sel_tp), "TN") for i in range(len(sel_tn))] +
@@ -170,7 +166,7 @@ for idx, category in categories:
     plt.savefig(os.path.join(SHAP_DIR, fname), dpi=150, bbox_inches="tight")
     plt.close()
 
-print("Saving text plots for error cases...")
+print("Saving text plots for error cases")
 error_start = len(sel_tp) + len(sel_tn)
 for i in range(len(sel_fp) + len(sel_fn)):
     idx      = error_start + i
@@ -184,9 +180,7 @@ for i in range(len(sel_fp) + len(sel_fn)):
 
 print(f"\nSHAP outputs saved to: {SHAP_DIR}")
 
-# ══════════════════════════════════════════════════════════════════════════════
 # PART 2 — CLEANLAB LABEL QUALITY AUDIT
-# ══════════════════════════════════════════════════════════════════════════════
 print(f"\n{'='*70}")
 print("PART 2 — CLEANLAB LABEL QUALITY AUDIT")
 print(f"{'='*70}")
@@ -206,13 +200,13 @@ for split_name, split_path in SPLITS.items():
     else:
         texts, labels = load_jsonl(split_path)
         print(f"  Samples : {len(texts)}  (label 0: {(labels==0).sum()}, label 1: {(labels==1).sum()})")
-        print(f"  Running inference...")
+        print(f"  Running inference")
         probs = get_probs(texts)
 
     label_issues_idx = find_label_issues(
         labels=labels,
         pred_probs=probs,
-        return_indices_ranked_by="self_confidence",
+        return_indices_ranked_by="self confidence",
     )
     quality_scores = get_label_quality_scores(labels=labels, pred_probs=probs)
 
@@ -262,7 +256,7 @@ for split_name, split_path in SPLITS.items():
                   f"pred={row['predicted_name']:7s}  "
                   f"p_human={row['prob_human']:.3f}  p_machine={row['prob_machine']:.3f}  "
                   f"quality={row['quality_score']:.3f}")
-            print(f"      text: {row['text_snippet'][:80]}...")
+            print(f"      text: {row['text_snippet'][:80]}")
 
     summary_rows.append({
         "split"                : split_name,
@@ -288,18 +282,7 @@ with open(os.path.join(CLEANLAB_DIR, "summary.json"), "w") as f:
 
 print(f"\nCleanlab outputs saved to: {CLEANLAB_DIR}")
 
-# ── Final ─────────────────────────────────────────────────────────────────────
-print(f"\n{'='*70}")
+# Final
 print("ALL DONE")
-print(f"{'='*70}")
 print(f"\nOutputs saved to: {OUTPUT_DIR}")
-print(f"  shap/")
-print(f"    global_bar.png          — top tokens driving machine classification")
-print(f"    beeswarm.png            — distribution of token impacts across all samples")
-print(f"    waterfall_*.png         — per-sample token contributions")
-print(f"    text_FP/FN_*.html       — highlighted token view for error cases")
-print(f"  cleanlab/")
-print(f"    <split>_quality.csv     — quality + confidence score for every sample")
-print(f"    <split>_flagged.csv     — flagged/suspicious samples with predicted labels")
-print(f"    summary.json            — overall stats per split incl. confidence distribution")
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

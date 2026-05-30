@@ -91,9 +91,9 @@ print(f"   Model loaded  ({sum(p.numel() for p in model.parameters()) / 1e6:.1f}
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"   Device: {device}")
 
-# ============================================================================
+
 # TOKENIZE
-# ============================================================================
+# =====================
 
 print(f"\nTokenizing (max_length={MAX_LENGTH})...")
 
@@ -117,9 +117,8 @@ train_eval_dataset = train_dataset.select(subset_idx)
 
 print(f"   Tokenization complete")
 
-# ============================================================================
 # METRICS
-# ============================================================================
+# ===================
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
@@ -150,9 +149,8 @@ def compute_metrics(eval_pred):
         "fn"             : int(fn),   # machine predicted human    
     }
 
-# ============================================================================
 # TRAINING ARGUMENTS
-# ============================================================================
+# ===========================
 
 print("\nConfiguring training arguments...")
 
@@ -179,9 +177,9 @@ training_args = TrainingArguments(
     report_to="none",
 )
 
-# ============================================================================
+
 # TRAINER
-# ============================================================================
+# ====================
 
 trainer = Trainer(
     model=model,
@@ -196,9 +194,9 @@ trainer = Trainer(
 print(f"\nStarting training ({EPOCHS} epochs, early stopping patience=2)\n")
 trainer.train()
 
-# ============================================================================
+
 # SAVE & EVALUATE
-# ============================================================================
+# ========================
 
 print("TRAINING COMPLETE")
 

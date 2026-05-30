@@ -19,12 +19,10 @@ OUTPUT_PATH = os.path.join(PROJECT_DIR, "finetuned_model", "test3_metrics.json")
 BATCH_SIZE = 16
 MAX_LENGTH = 512
 
-print("=" * 70)
 print("ISIZULU AI-DETECTION CLASSIFIER  —  TEST SET EVALUATION")
 print("  Label 1 = machine-written  |  Label 0 = human-written")
-print("=" * 70)
 
-# ── Load test data ────────────────────────────────────────────────────────────
+# Load test data
 print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Loading test set from {TEST_PATH}")
 texts, labels = [], []
 with open(TEST_PATH, "r", encoding="utf-8") as f:
@@ -39,7 +37,7 @@ with open(TEST_PATH, "r", encoding="utf-8") as f:
 labels = np.array(labels)
 print(f"   Samples: {len(texts)}  (0: {(labels==0).sum()}, 1: {(labels==1).sum()})")
 
-# ── Load model & tokenizer ────────────────────────────────────────────────────
+# Load model & tokenizer
 print(f"\nLoading model from {MODEL_PATH}")
 device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
@@ -48,7 +46,7 @@ model.to(device)
 model.eval()
 print(f"   Device: {device}")
 
-# ── Run inference in batches ──────────────────────────────────────────────────
+# Run inference in batches
 print(f"\nRunning inference (batch_size={BATCH_SIZE})...")
 all_logits = []
 with torch.no_grad():
@@ -68,7 +66,7 @@ with torch.no_grad():
 
 all_logits = np.concatenate(all_logits, axis=0)
 
-# ── Compute metrics ───────────────────────────────────────────────────────────
+# Compute metrics
 preds = np.argmax(all_logits, axis=-1)
 exp   = np.exp(all_logits - all_logits.max(axis=-1, keepdims=True))
 probs_machine = (exp / exp.sum(axis=-1, keepdims=True))[:, 1]
@@ -92,10 +90,8 @@ metrics = {
     "total_samples"   : len(texts),
 }
 
-# ── Print results ─────────────────────────────────────────────────────────────
-print("\n" + "=" * 70)
+# Print results
 print("TEST SET RESULTS")
-print("=" * 70)
 print(f"   Accuracy          : {metrics['accuracy']:.4f}  ({metrics['accuracy']*100:.2f}%)")
 print(f"   ROC-AUC           : {metrics['roc_auc']:.4f}")
 print(f"   MCC               : {metrics['mcc']:.4f}")
@@ -111,7 +107,7 @@ print(f"                  Human   Machine")
 print(f"   Actual Human    {tn:4d}     {fp:4d}    (TN / FP)")
 print(f"   Actual Machine  {fn:4d}     {tp:4d}    (FN / TP)")
 
-# ── Save ──────────────────────────────────────────────────────────────────────
+# Save
 with open(OUTPUT_PATH, "w") as f:
     json.dump(metrics, f, indent=2)
 print(f"\nMetrics saved to: {OUTPUT_PATH}")
