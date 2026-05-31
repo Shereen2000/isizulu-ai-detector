@@ -1,9 +1,10 @@
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-
 import os
 import json
+import subprocess
 from datetime import datetime
+import gdown
 
 import torch
 import numpy as np
@@ -20,33 +21,38 @@ from sklearn.metrics import (
     matthews_corrcoef, roc_auc_score, confusion_matrix,
 )
 
-# ============================================================================
 # CONFIGURATION
-# ============================================================================
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 
-MODEL_PATH   = os.path.join(PROJECT_DIR, "base model", "model")
+MODEL_PATH   = os.path.join(PROJECT_DIR, "base_model")
 TRAIN_PATH   = os.path.join(PROJECT_DIR, "datasets", "train.jsonl")
 EVAL_PATH    = os.path.join(PROJECT_DIR, "datasets", "eval.jsonl")
-OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_classifier")
+OUTPUT_DIR   = os.path.join(PROJECT_DIR, "finetuned_model")
+
+SAFETENSORS_FILE_ID = "1RjJqRRIz7KS6oPphXVFeQWcFigp2oaHo"
 
 MAX_LENGTH    = 512
 BATCH_SIZE    = 8
-GRAD_ACCUM    = 4           # effective batch = 32
+GRAD_ACCUM    = 4      
 LEARNING_RATE = 2e-5
 EPOCHS        = 5
 SEED          = 42
 
-# ============================================================================
-# LOAD DATASET
-# ============================================================================
+def download_base_model_weights():
+    dest = os.path.join(MODEL_PATH, "model.safetensors")
+    if os.path.exists(dest):
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] model.safetensors already exists, skipping download")
+        return
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Downloading model.safetensors into {MODEL_PATH}")
+    gdown.download(id=SAFETENSORS_FILE_ID, output=dest, quiet=False)
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Download complete")
 
-print("=" * 70)
+download_base_model_weights()
+
+# LOAD DATASET
 print("ISIZULU AI-DETECTION CLASSIFIER  —  FINE-TUNING")
 print("  Label 1 = machine-written  |  Label 0 = human-written")
-print("=" * 70)
 
 def load_jsonl(path):
     texts, labels = [], []
@@ -74,10 +80,7 @@ eval_dataset  = Dataset.from_dict({"text": eval_texts,  "label": eval_labels}).c
 print(f"   Training samples  : {len(train_dataset)}  (0: {train_labels.count(0)}, 1: {train_labels.count(1)})")
 print(f"   Evaluation samples: {len(eval_dataset)}   (0: {eval_labels.count(0)}, 1: {eval_labels.count(1)})")
 
-# ============================================================================
 # LOAD TOKENIZER & MODEL
-# ============================================================================
-
 print(f"\nLoading model from: {MODEL_PATH}")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 print("   Tokenizer loaded")
@@ -94,11 +97,9 @@ print(f"   Model loaded  ({sum(p.numel() for p in model.parameters()) / 1e6:.1f}
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"   Device: {device}")
 
-# ============================================================================
-# TOKENIZE
-# ============================================================================
 
-print(f"\nTokenizing (max_length={MAX_LENGTH})...")
+# TOKENIZE
+print(f"\nTokenizing (max_length={MAX_LENGTH})")
 
 def preprocess(examples):
     return tokenizer(
@@ -120,10 +121,7 @@ train_eval_dataset = train_dataset.select(subset_idx)
 
 print(f"   Tokenization complete")
 
-# ============================================================================
 # METRICS
-# ============================================================================
-
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
@@ -133,31 +131,28 @@ def compute_metrics(eval_pred):
     tn, fp, fn, tp = confusion_matrix(labels, preds, labels=[0, 1]).ravel()
 
     return {
-        # ── Performance ──────────────────────────────────────────────────
+        # Performance
         "accuracy"       : accuracy_score(labels, preds),
         "f1"             : f1_score(labels, preds, average="binary"),
         "precision"      : precision_score(labels, preds, average="binary"),
         "recall"         : recall_score(labels, preds, average="binary"),
-        # ── Per-class ────────────────────────────────────────────────────
+        # Per-class
         "f1_human"       : f1_score(labels, preds, pos_label=0, average="binary"),
         "f1_machine"     : f1_score(labels, preds, pos_label=1, average="binary"),
         "precision_human": precision_score(labels, preds, pos_label=0, average="binary"),
         "recall_human"   : recall_score(labels, preds, pos_label=0, average="binary"),
-        # ── Calibration / ranking ────────────────────────────────────────
+        # Calibration / ranking
         "roc_auc"        : roc_auc_score(labels, probs_machine),
         "mcc"            : matthews_corrcoef(labels, preds),
-        # ── Confusion matrix counts ───────────────────────────────────────
-        "tp"             : int(tp),   # machine predicted machine  ✓
-        "tn"             : int(tn),   # human   predicted human    ✓
-        "fp"             : int(fp),   # human   predicted machine  ✗
-        "fn"             : int(fn),   # machine predicted human    ✗
+        # Confusion matrix counts 
+        "tp"             : int(tp),   # machine predicted machine  
+        "tn"             : int(tn),   # human   predicted human    
+        "fp"             : int(fp),   # human   predicted machine  
+        "fn"             : int(fn),   # machine predicted human    
     }
 
-# ============================================================================
 # TRAINING ARGUMENTS
-# ============================================================================
-
-print("\nConfiguring training arguments...")
+print("\nConfiguring training arguments")
 
 training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
@@ -182,10 +177,8 @@ training_args = TrainingArguments(
     report_to="none",
 )
 
-# ============================================================================
-# TRAINER
-# ============================================================================
 
+# TRAINER
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -196,28 +189,24 @@ trainer = Trainer(
     callbacks=[EarlyStoppingCallback(early_stopping_patience=2)],
 )
 
-print(f"\nStarting training ({EPOCHS} epochs, early stopping patience=2)...\n")
+print(f"\nStarting training ({EPOCHS} epochs, early stopping patience=2)\n")
 trainer.train()
 
-# ============================================================================
-# SAVE & EVALUATE
-# ============================================================================
 
-print("\n" + "=" * 70)
+# SAVE & EVALUATE
 print("TRAINING COMPLETE")
-print("=" * 70)
 
 final_path = os.path.join(OUTPUT_DIR, "final_model")
 model.save_pretrained(final_path)
 tokenizer.save_pretrained(final_path)
 print(f"Final model saved to: {final_path}")
 
-print("\nRunning final evaluation on eval set...")
+print("\nRunning final evaluation on eval set")
 eval_results        = trainer.evaluate(eval_dataset=eval_dataset,        metric_key_prefix="eval")
-print("\nRunning final evaluation on train subset...")
+print("\nRunning final evaluation on train subset")
 train_eval_results  = trainer.evaluate(eval_dataset=train_eval_dataset,  metric_key_prefix="train")
 
-print("\n── Eval set ──────────────────────────────────────")
+print("\nEval set ──")
 print(f"   Loss      : {eval_results['eval_loss']:.4f}")
 print(f"   Accuracy  : {eval_results['eval_accuracy']:.4f}")
 print(f"   F1        : {eval_results['eval_f1']:.4f}")
@@ -227,7 +216,7 @@ print(f"   ROC-AUC   : {eval_results['eval_roc_auc']:.4f}")
 print(f"   MCC       : {eval_results['eval_mcc']:.4f}")
 print(f"   TP/TN/FP/FN: {eval_results['eval_tp']} / {eval_results['eval_tn']} / {eval_results['eval_fp']} / {eval_results['eval_fn']}")
 
-print("\n── Train subset (overfitting check) ──────────────")
+print("\nTrain subset (overfitting check) ──")
 print(f"   Loss      : {train_eval_results['train_loss']:.4f}")
 print(f"   Accuracy  : {train_eval_results['train_accuracy']:.4f}")
 print(f"   F1        : {train_eval_results['train_f1']:.4f}")
@@ -245,3 +234,7 @@ print(f"\nMetrics saved to: {metrics_path}")
 
 print(f"\nDone at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print(f"Output directory: {OUTPUT_DIR}")
+
+print("---------------------------------------------------------------------")
+print("Starting test")
+subprocess.run(["python3", os.path.join(SCRIPT_DIR, "test.py")], check=True)

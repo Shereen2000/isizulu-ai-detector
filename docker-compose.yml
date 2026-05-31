@@ -7,7 +7,11 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
-      - "./base model:/app/base model:ro"
+      - "./base_model:/app/base_model"
       - "./datasets:/app/datasets:ro"
-      - "./finetuned_classifier:/app/finetuned_classifier"
+      - "./finetuned_model:/app/finetuned_model"
+      - "./model_audit:/app/model_audit"
+    # Train (runs tests automatically at the end):
     command: python3 scripts/finetune.py
+    # Inference only (comment out the line above and uncomment below):
+    # command: python3 scripts/test.py

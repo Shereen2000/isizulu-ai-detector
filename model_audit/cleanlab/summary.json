@@ -1,0 +1,41 @@
+[
+  {
+    "split": "train",
+    "total_samples": 16377,
+    "label_issues": 0,
+    "issue_pct": 0.0,
+    "human_flagged": 0,
+    "machine_flagged": 0,
+    "mean_quality_score": 0.9988,
+    "min_quality_score": 0.0002,
+    "mean_confidence": 0.9996,
+    "pct_conf_above_99": 99.8,
+    "pct_conf_below_90": 0.09
+  },
+  {
+    "split": "eval",
+    "total_samples": 1991,
+    "label_issues": 5,
+    "issue_pct": 0.25,
+    "human_flagged": 4,
+    "machine_flagged": 1,
+    "mean_quality_score": 0.9938,
+    "min_quality_score": 0.0001,
+    "mean_confidence": 0.9989,
+    "pct_conf_above_99": 99.35,
+    "pct_conf_below_90": 0.3
+  },
+  {
+    "split": "test",
+    "total_samples": 2022,
+    "label_issues": 9,
+    "issue_pct": 0.45,
+    "human_flagged": 9,
+    "machine_flagged": 0,
+    "mean_quality_score": 0.9923,
+    "min_quality_score": 0.0,
+    "mean_confidence": 0.9988,
+    "pct_conf_above_99": 99.21,
+    "pct_conf_below_90": 0.3
+  }
+]
