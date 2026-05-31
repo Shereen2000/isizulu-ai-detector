@@ -22,5 +22,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY scripts/ ./scripts/
+COPY datasets/ ./datasets/
+COPY base_model/ ./base_model/
+COPY finetuned_model/ ./finetuned_model/
 
 CMD ["python3", "scripts/finetune.py"]

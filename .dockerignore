@@ -1,6 +1,6 @@
 finetuned_classifier/
-base model/
-datasets/
+base_model/model.safetensors
+finetuned_model/final_model/model.safetensors
 .claude/
 __pycache__/
 *.pyc
