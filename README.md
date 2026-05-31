@@ -133,20 +133,50 @@ This is the fastest way to get going. The image is already built and hosted on G
 ```bash
 # Pull the image
 docker pull ghcr.io/tumisomokautu/zulu-classifier:latest
+```
 
-# Run training
-docker run --gpus all ghcr.io/tumisomokautu/zulu-classifier:latest
+**Recommended: interactive shell**
 
-# Run inference/testing only
+Start a shell inside the container and run scripts manually. This keeps everything in the same container, so fine-tuned weights are immediately available to the test script without any volume mounting:
+
+```bash
+docker run --gpus all -it ghcr.io/tumisomokautu/zulu-classifier:latest bash
+```
+
+Then inside the container:
+
+```bash
+# Step 1 — fine-tune (takes ~20+ minutes on a good GPU)
+python3 scripts/finetune.py
+
+# Step 2 — evaluate
+python3 scripts/test.py
+```
+
+The model weights download automatically on first run.
+
+**Alternative: run a script directly without entering the shell**
+
+You can also pass the script as a command to `docker run` and skip the interactive shell:
+
+```bash
+# Fine-tune only
+docker run --gpus all ghcr.io/tumisomokautu/zulu-classifier:latest python3 scripts/finetune.py
+
+# Evaluate only
 docker run --gpus all ghcr.io/tumisomokautu/zulu-classifier:latest python3 scripts/test.py
 ```
 
-The model weights download automatically on first run. Output (finetuned model, metrics) is written inside the container. If you want to get it out onto your host machine, mount a volume:
+Note that each `docker run` creates a separate container, so running fine-tune and test this way means the fine-tuned weights won't carry over, use the interactive shell approach above if you want to run both in sequence.
+
+**Saving output to your host machine**
+
+Output written inside the container is lost when you exit. Mount a volume to persist the fine-tuned model:
 
 ```bash
-docker run --gpus all \
+docker run --gpus all -it \
   -v $(pwd)/finetuned_model:/app/finetuned_model \
-  ghcr.io/tumisomokautu/zulu-classifier:latest
+  ghcr.io/tumisomokautu/zulu-classifier:latest bash
 ```
 
 **Running on CPU (no GPU):**

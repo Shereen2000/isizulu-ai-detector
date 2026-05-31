@@ -26,4 +26,8 @@ COPY datasets/ ./datasets/
 COPY base_model/ ./base_model/
 COPY finetuned_model/ ./finetuned_model/
 
-CMD ["python3", "scripts/finetune.py"]
+# Default: drop into an interactive shell so you can run scripts manually
+# Override by appending a command, e.g:
+#   docker run --gpus all -it ghcr.io/tumisomokautu/zulu-classifier:latest python3 scripts/finetune.py
+#   docker run --gpus all -it ghcr.io/tumisomokautu/zulu-classifier:latest python3 scripts/test.py
+CMD ["bash"]
